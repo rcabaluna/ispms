@@ -1,0 +1,65 @@
+import React from "react";
+import {
+    Table,
+    TableHeader,
+    TableBody,
+    TableRow,
+    TableHead,
+    TableCell,
+} from "@/components/ui/table";
+
+const RequestsTable = ({ requests, selectedRequest, onSelectRequest }) => {
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "2-digit",
+        });
+    };
+
+    return (
+        <Table>
+            <TableHeader>
+                <TableRow>
+                    <TableHead>Requests</TableHead>
+                </TableRow>
+            </TableHeader>
+            <TableBody>
+                {requests.map((request) => (
+                    <TableRow
+                        key={request.requestsummaryid}
+                        onClick={() => onSelectRequest(request)}
+                        style={{
+                            cursor: "pointer",
+                            backgroundColor:
+                                selectedRequest?.requestsummaryid ===
+                                request.requestsummaryid
+                                    ? "#e0e0e0"
+                                    : "transparent",
+                        }}
+                    >
+                        <TableCell className="py-4 text-sm text-gray-700">
+                            <div className="font-semibold mb-1">
+                                Purpose: {request.purpose}
+                            </div>
+                            <div className="text-gray-600 text-sm">
+                                Requester:{" "}
+                                <span className="font-medium">
+                                    {request.requester_details.firstname}{" "}
+                                    {request.requester_details.surname}{" "}
+                                    {request.requester_details.nameExtension}
+                                </span>
+                            </div>
+                            <div className="text-xs text-gray-500 mt-1">
+                                Requested on: {formatDate(request.requestdate)}
+                            </div>
+                        </TableCell>
+                    </TableRow>
+                ))}
+            </TableBody>
+        </Table>
+    );
+};
+
+export default RequestsTable;
