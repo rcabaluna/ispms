@@ -14,7 +14,7 @@ class InventoryItemsModel extends Model
         'quantity',
         'unit_cost',
         'uacs_code',
-        'serialnumber',
+        'POnumber',
     ];
 
     public $timestamps = false;

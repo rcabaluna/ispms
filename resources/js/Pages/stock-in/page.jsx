@@ -24,7 +24,7 @@ import { Toaster } from "@/components/ui/toaster";
 
 const StockIn = ({ stockins }) => {
     const [excelData, setExcelData] = useState([]);
-    const [serialNumber, setSerialNumber] = useState("");
+    const [PONumber, setPONumber] = useState("");
     const [file, setFile] = useState(null);
     const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -63,14 +63,14 @@ const StockIn = ({ stockins }) => {
     const handleSubmit = (event) => {
         event.preventDefault();
 
-        if (!serialNumber || !file) {
+        if (!PONumber || !file) {
             alert("Please fill in all fields.");
             return;
         }
         router.post(
             route("stock-in.store"),
             {
-                serial_number: serialNumber,
+                ponumber: PONumber,
                 excel_data: excelData,
             },
             {
@@ -80,16 +80,16 @@ const StockIn = ({ stockins }) => {
                         description: response.props.flash.message,
                         className: "bg-green-500 text-white",
                     });
-                    setSerialNumber("");
+                    setPONumber("");
                     setFile(null);
                     setExcelData([]);
                     setDialogOpen(false);
                 },
                 onError: (errors) => {
-                    if (errors.serial_number) {
+                    if (errors.ponumber) {
                         ShowToast({
-                            title: "Duplicate Serial Number",
-                            description: errors.serial_number,
+                            title: "Duplicate PO Number",
+                            description: errors.ponumber,
                             className: "bg-red-500 text-white",
                         });
                     } else {
@@ -133,15 +133,15 @@ const StockIn = ({ stockins }) => {
                                 <div className="grid gap-4">
                                     <div className="space-y-2">
                                         <h4 className="font-medium leading-none">
-                                            Serial Number
+                                            PO Number
                                         </h4>
                                         <Input
                                             id="serial"
                                             className="col-span-2 h-8"
                                             placeholder="xxxx-xx-xxxx"
-                                            value={serialNumber}
+                                            value={PONumber}
                                             onChange={(e) =>
-                                                setSerialNumber(e.target.value)
+                                                setPONumber(e.target.value)
                                             }
                                             required
                                         />

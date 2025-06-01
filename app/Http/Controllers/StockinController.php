@@ -24,17 +24,17 @@ class StockinController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'serial_number' => 'required|unique:tblstockin,serialnumber',
+            'ponumber' => 'required|unique:tblstockin,ponumber',
             'excel_data' => 'required|array',
         ], [
-            'serial_number.unique' => 'Serial number already exists.'
+            'ponumber.unique' => 'PO Number already exists.'
         ]);
 
-        $serialnumber = $request->input('serial_number');
+        $ponumber = $request->input('ponumber');
         $file = $request->input('excel_data');
 
         StockinModel::create([
-            'serialnumber' => $serialnumber,
+            'ponumber' => $ponumber,
         ]);
 
         foreach ($file as $row) {
@@ -45,15 +45,13 @@ class StockinController extends Controller
                     'quantity' => $row['quantity'],
                     'unit_cost' => $row['unit_cost'],
                     'uacs_code' => $row['uacs_code'] ?? null,
-                    'serialnumber' => $serialnumber
+                    'POnumber' => $ponumber
                 ]);
             }
         }
 
         return back()->with('message', 'Stock-in data has been uploaded successfully.');
     }
-
-
 
 
     /**
@@ -64,39 +62,30 @@ class StockinController extends Controller
         $stockin = StockinModel::where('stockinid', $stockinid)->get()->first();
 
    
-        $items = InventoryItemsModel::where('serialnumber', $stockin['serialnumber'])->get();
+   
+        $items = InventoryItemsModel::where('POnumber', $stockin['POnumber'])->get();
+
 
         return inertia('stock-in/Partials/ItemsList', [
             'items' => $items, 'stockin' => $stockin
         ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $stockinid)
     {
 
-        $serialnumber = $request->input('serial_number');
+        $ponumber = $request->input('ponumber');
 
         
         $request->validate([
-            'serial_number' => 'required|unique:tblstockin,serialnumber',
+            'ponumber' => 'required|unique:tblstockin,ponumber',
         ], [
-            'serial_number.unique' => 'Serial number already exists.'
+            'ponumber.unique' => 'PO Number already exists.'
         ]);
 
        
         StockinModel::where('stockinid', $stockinid)->update([
-            'serialnumber' => $serialnumber,
+            'ponumber' => $ponumber,
         ]);
 
 

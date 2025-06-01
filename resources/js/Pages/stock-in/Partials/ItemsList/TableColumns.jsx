@@ -168,10 +168,10 @@ export const columns = [
                             setEditOpen(false);
                         },
                         onError: (errors) => {
-                            if (errors.serial_number) {
+                            if (errors.ponumber) {
                                 ShowToast({
-                                    title: "Duplicate Serial Number",
-                                    description: errors.serial_number,
+                                    title: "Duplicate PO Number",
+                                    description: errors.ponumber,
                                     className: "bg-red-500 text-white",
                                 });
                             } else {

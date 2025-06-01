@@ -105,10 +105,10 @@ export function DataTable({ columns, data }) {
                                         {header.isPlaceholder
                                             ? null
                                             : flexRender(
-                                                  header.column.columnDef
-                                                      .header,
-                                                  header.getContext()
-                                              )}
+                                                header.column.columnDef
+                                                    .header,
+                                                header.getContext()
+                                            )}
                                     </TableHead>
                                 ))}
                             </TableRow>
@@ -148,7 +148,7 @@ export function DataTable({ columns, data }) {
                                                                 )}
                                                             </button>
                                                         </PopoverTrigger>
-                                                        <PopoverContent className="w-96 text-sm">
+                                                        <PopoverContent className="w-[700px] text-sm">
                                                             <p className="text-sm font-medium">
                                                                 Item Details
                                                             </p>
@@ -163,7 +163,7 @@ export function DataTable({ columns, data }) {
                                                                         <TableHeader className="bg-gray-100 sticky top-0 z-10">
                                                                             <TableRow>
                                                                                 <TableHead className="w-1/4">
-                                                                                    Serial
+                                                                                    PO
                                                                                     Number
                                                                                 </TableHead>
                                                                                 <TableHead className="w-1/4 text-center">
@@ -194,7 +194,7 @@ export function DataTable({ columns, data }) {
                                                                                             <b>
                                                                                                 {" "}
                                                                                                 {
-                                                                                                    item.serialnumber
+                                                                                                    item.POnumber
                                                                                                 }
                                                                                             </b>
                                                                                         </TableCell>

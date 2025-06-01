@@ -166,7 +166,7 @@ INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, 
 
 CREATE TABLE `tblinventory_items` (
   `invitemsid` int(11) UNSIGNED NOT NULL,
-  `serialnumber` varchar(45) NOT NULL,
+  `ponumber` varchar(45) NOT NULL,
   `stock_no` varchar(255) DEFAULT NULL,
   `quantity` double(15,2) NOT NULL,
   `item` varchar(255) NOT NULL,
@@ -178,7 +178,7 @@ CREATE TABLE `tblinventory_items` (
 -- Dumping data for table `tblinventory_items`
 --
 
-INSERT INTO `tblinventory_items` (`invitemsid`, `serialnumber`, `stock_no`, `quantity`, `item`, `unit_cost`, `uacs_code`) VALUES
+INSERT INTO `tblinventory_items` (`invitemsid`, `ponumber`, `stock_no`, `quantity`, `item`, `unit_cost`, `uacs_code`) VALUES
 (2276, '2025-03-0003', '110-01A', 37.00, 'PAPER, Multi-Purpose (COPY) Legal, 70gsm', 204.56, NULL),
 (2277, '2025-03-0003', '110-01B', 6.00, 'PAPER, Multi-Purpose (COPY) Short, 70gsm', 174.00, NULL),
 (2278, '2025-03-0003', '110-01C', 191.00, 'PAPER, Multi-Purpose (COPY) A4, 70gsm', 170.77, NULL),
@@ -620,7 +620,7 @@ INSERT INTO `tblris` (`risid`, `empNumber`, `stock_no`, `quantity`, `month`, `ye
 
 CREATE TABLE `tblstockin` (
   `stockinid` int(11) UNSIGNED NOT NULL,
-  `serialnumber` varchar(255) NOT NULL,
+  `ponumber` varchar(255) NOT NULL,
   `fundcluster` varchar(255) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
@@ -630,7 +630,7 @@ CREATE TABLE `tblstockin` (
 -- Dumping data for table `tblstockin`
 --
 
-INSERT INTO `tblstockin` (`stockinid`, `serialnumber`, `fundcluster`, `created_at`, `updated_at`) VALUES
+INSERT INTO `tblstockin` (`stockinid`, `ponumber`, `fundcluster`, `created_at`, `updated_at`) VALUES
 (20, '2025-03-0003', NULL, '2025-05-22 23:38:27', '2025-05-22 23:38:27'),
 (21, '2025-03-0005', NULL, '2025-05-22 23:50:48', '2025-05-22 23:50:48');
 
@@ -759,7 +759,7 @@ ALTER TABLE `sessions`
 --
 ALTER TABLE `tblinventory_items`
   ADD PRIMARY KEY (`invitemsid`),
-  ADD KEY `inv_fk_idx` (`serialnumber`);
+  ADD KEY `inv_fk_idx` (`ponumber`);
 
 --
 -- Indexes for table `tblrequest_details`
@@ -785,7 +785,7 @@ ALTER TABLE `tblris`
 --
 ALTER TABLE `tblstockin`
   ADD PRIMARY KEY (`stockinid`),
-  ADD UNIQUE KEY `tblstockin_serialnumber_unique` (`serialnumber`);
+  ADD UNIQUE KEY `tblstockin_serialnumber_unique` (`ponumber`);
 
 --
 -- Indexes for table `tbluom`
@@ -885,7 +885,7 @@ ALTER TABLE `users`
 -- Constraints for table `tblinventory_items`
 --
 ALTER TABLE `tblinventory_items`
-  ADD CONSTRAINT `inv_fk` FOREIGN KEY (`serialnumber`) REFERENCES `tblstockin` (`serialnumber`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `inv_fk` FOREIGN KEY (`ponumber`) REFERENCES `tblstockin` (`ponumber`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `tblrequest_details`

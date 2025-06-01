@@ -39,7 +39,7 @@ class InventoryItemsController extends Controller
         $stock_no = $request->input('stock_no');
 
         $items = DB::table('tblinventory_items as a')
-            ->join('tblstockin as b', 'b.serialnumber', '=', 'a.serialnumber')
+            ->join('tblstockin as b', 'b.ponumber', '=', 'a.ponumber')
             ->select('a.*', 'b.created_at')
             ->where('a.stock_no', $stock_no)
             ->orderBy('b.created_at', 'desc')

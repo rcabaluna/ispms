@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import MainLayout from "@/Layouts/MainLayout";
 import RequestsTable from "./Partials/RequestsTable";
-import { Button } from "@/Components/ui/button";
 import {
     Select,
     SelectContent,
@@ -99,12 +98,7 @@ const Requests = ({ requests }) => {
 
                     {/* Main Content */}
                     <div className="w-[80%] px-6 py-4 space-y-4">
-                        <div className="flex items-center justify-between">
-                            <p className="text-lg font-medium">Requests</p>
-                            <Button onClick={() => setOpenDialog(true)}>
-                                Acknowledge
-                            </Button>
-                        </div>
+
 
                         <RequestsDetails selectedRequest={selectedRequest} />
                     </div>

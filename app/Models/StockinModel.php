@@ -8,7 +8,7 @@ class StockinModel extends Model
 {
     protected $table = 'tblstockin';
     protected $fillable = [
-        'serialnumber'
+        'PONumber'
     ];
 
     public $timestamps = true;

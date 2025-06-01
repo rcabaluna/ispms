@@ -6,7 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 
 const ItemsList = ({ stockin, items }) => {
     const handleBack = () => {
-        window.history.back(); // or use router.visit(previousUrl) if more control is needed
+        window.history.back();
     };
 
     const formatDate = (dateString) => {
@@ -33,7 +33,7 @@ const ItemsList = ({ stockin, items }) => {
                             ← Back
                         </button>
                         <h1 className="text-xl font-bold">
-                            Serial Number: {stockin.serialnumber}
+                            PO Number: {stockin.ponumber}
                         </h1>
                         <p className="text-sm text-muted-foreground">
                             Date Uploaded: {formatDate(stockin.created_at)}

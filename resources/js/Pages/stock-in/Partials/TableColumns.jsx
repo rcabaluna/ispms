@@ -68,9 +68,9 @@ export const columns = [
         enableHiding: false,
     },
     {
-        accessorKey: "serialnumber",
+        accessorKey: "POnumber",
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Serial Number" />
+            <DataTableColumnHeader column={column} title="PO Number" />
         ),
     },
     {
@@ -98,7 +98,7 @@ export const columns = [
             const { delete: destroy } = useForm();
             const [open, setOpen] = useState(false);
             const [editOpen, setEditOpen] = useState(false);
-            const [serialNumber, setSerialNumber] = useState("");
+            const [PONumber, setPONumber] = useState("");
 
             const handleViewItems = () => {
                 router.visit(`/inventory/stock-in/${stockin.stockinid}`);
@@ -138,7 +138,7 @@ export const columns = [
                         stock_in: stockinid,
                     }),
                     {
-                        serial_number: serialNumber,
+                        ponumber: PONumber,
                     },
                     {
                         onSuccess: (response) => {
@@ -150,10 +150,10 @@ export const columns = [
                             setEditOpen(false);
                         },
                         onError: (errors) => {
-                            if (errors.serial_number) {
+                            if (errors.ponumber) {
                                 ShowToast({
-                                    title: "Duplicate Serial Number",
-                                    description: errors.serial_number,
+                                    title: "Duplicate PO Number",
+                                    description: errors.ponumber,
                                     className: "bg-red-500 text-white",
                                 });
                             } else {
@@ -183,7 +183,7 @@ export const columns = [
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
                                 onClick={() => {
-                                    setSerialNumber(stockin.serialnumber);
+                                    setPONumber(stockin.ponumber);
                                     setEditOpen(true);
                                 }}
                             >
@@ -239,13 +239,13 @@ export const columns = [
                             <div className="grid gap-4">
                                 <div className="space-y-2">
                                     <Label htmlFor="serial">
-                                        Serial Number
+                                        PO Number
                                     </Label>
                                     <Input
                                         id="serial"
-                                        value={serialNumber}
+                                        value={PONumber}
                                         onChange={(e) =>
-                                            setSerialNumber(e.target.value)
+                                            setPONumber(e.target.value)
                                         }
                                         placeholder="xxxx-xx-xxxx"
                                         required

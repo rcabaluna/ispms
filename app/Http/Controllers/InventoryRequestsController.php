@@ -49,16 +49,12 @@ class InventoryRequestsController extends Controller
         }, $requests);
 
 
-        // Send merged requests to the view (won't be reached if dd() is active)
         return inertia('requests/page', [
             'requests' => $mergedRequests,
         ]);
     }
 
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $requestsummaryid)
     {
 
@@ -85,8 +81,9 @@ class InventoryRequestsController extends Controller
             )
             ->get();
 
-            dd($data);
-
+            return response()->json([
+                'items' => $data
+            ]);
     }
 
 }
