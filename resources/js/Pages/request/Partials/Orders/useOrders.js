@@ -6,6 +6,7 @@ const useOrders = ({ employees, selectedItem, onItemAdded }) => {
     const [supervisorName, setSupervisorName] = useState("");
     const [requester, setRequester] = useState(null);
     const [supervisor, setSupervisor] = useState(null);
+    const [purpose, setPurpose] = useState("");
     const [items, setItems] = useState([]);
     const [isProcessing, setIsProcessing] = useState(false);
 
@@ -71,6 +72,7 @@ const useOrders = ({ employees, selectedItem, onItemAdded }) => {
                 summary: {
                     requester: requester?.empNumber || null,
                     supervisor: supervisor?.empNumber || null,
+                    purpose: purpose || null,
                 },
                 details: items,
             },
@@ -100,6 +102,8 @@ const useOrders = ({ employees, selectedItem, onItemAdded }) => {
         supervisorName,
         setRequesterName,
         setSupervisorName,
+        purpose,
+        setPurpose,
         items,
         updateQuantity,
         removeItem,

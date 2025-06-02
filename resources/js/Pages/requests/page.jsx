@@ -19,6 +19,8 @@ const Requests = ({ requests }) => {
     const [selectedMonth, setSelectedMonth] = useState(currentMonth);
     const [selectedYear, setSelectedYear] = useState(currentYear);
     const [selectedRequest, setSelectedRequest] = useState(null);
+    const [requestsData, setRequestsData] = useState(requests);
+
 
     const years = Array.from(
         { length: 10 },
@@ -87,12 +89,13 @@ const Requests = ({ requests }) => {
                             style={{ maxHeight: "calc(100vh - 100px)" }}
                         >
                             <RequestsTable
-                                requests={requests}
+                                requests={requestsData}
                                 month={selectedMonth}
                                 year={selectedYear}
                                 selectedRequest={selectedRequest}
                                 onSelectRequest={setSelectedRequest}
                             />
+
                         </div>
                     </div>
 
@@ -100,7 +103,13 @@ const Requests = ({ requests }) => {
                     <div className="w-[80%] px-6 py-4 space-y-4">
 
 
-                        <RequestsDetails selectedRequest={selectedRequest} />
+                        <RequestsDetails
+                            selectedRequest={selectedRequest}
+                            setSelectedRequest={setSelectedRequest}
+                            setRequestsData={setRequestsData}
+                            requestsData={requestsData}
+                        />
+
                     </div>
                 </div>
             </div>

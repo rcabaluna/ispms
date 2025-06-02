@@ -5,8 +5,10 @@ const OrdersForm = ({
     employees,
     requesterName,
     supervisorName,
+    purpose,
     setRequesterName,
     setSupervisorName,
+    setPurpose,
 }) => {
     return (
         <form
@@ -34,6 +36,19 @@ const OrdersForm = ({
                     value={supervisorName}
                     onSelect={setSupervisorName}
                     placeholder="Select supervisor..."
+                />
+            </div>
+
+            <div className="flex flex-col md:col-span-2">
+                <label className="mb-2 text-lg font-semibold text-sky-900">
+                    Purpose
+                </label>
+                <textarea
+                    className="p-3 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    rows="2"
+                    placeholder="Enter the purpose..."
+                    value={purpose}
+                    onChange={(e) => setPurpose(e.target.value)}
                 />
             </div>
         </form>

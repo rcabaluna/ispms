@@ -14,6 +14,8 @@ const Orders = ({ employees, selectedItem, onItemAdded }) => {
         items,
         requesterName,
         supervisorName,
+        purpose,
+        setPurpose,
         setRequesterName,
         setSupervisorName,
         updateQuantity,
@@ -28,8 +30,10 @@ const Orders = ({ employees, selectedItem, onItemAdded }) => {
                 employees={employees}
                 requesterName={requesterName}
                 supervisorName={supervisorName}
+                purpose={purpose}
                 setRequesterName={setRequesterName}
                 setSupervisorName={setSupervisorName}
+                setPurpose={setPurpose}
             />
 
             <OrdersTable

@@ -21,6 +21,7 @@ class InventoryRequestsController extends Controller
                 a.firstname, 
                 a.nameExtension, 
                 a.middlename, 
+                a.middleInitial, 
                 c.positionDesc
             FROM tblemppersonal a 
             JOIN tblempposition b ON b.empNumber = a.empNumber
@@ -29,6 +30,7 @@ class InventoryRequestsController extends Controller
 
         // Load all request summaries
         $requests = RequestSummaryModel::get()->toArray();
+
 
         // Merge requests with both requester and supervisor info
         $mergedRequests = array_map(function ($request) use ($employees) {
@@ -39,6 +41,7 @@ class InventoryRequestsController extends Controller
             $request['requester_details'] = $employees->has($requesterEmpNo)
                 ? (array) $employees->get($requesterEmpNo)
                 : null;
+
 
             // Add supervisor details
             $request['supervisor_details'] = $employees->has($supervisorEmpNo)

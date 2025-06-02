@@ -34,15 +34,14 @@ const RequestsTable = ({ requests, selectedRequest, onSelectRequest }) => {
                             cursor: "pointer",
                             backgroundColor:
                                 selectedRequest?.requestsummaryid ===
-                                request.requestsummaryid
+                                    request.requestsummaryid
                                     ? "#e0e0e0"
                                     : "transparent",
                         }}
                     >
-                        <TableCell className="py-4 text-sm text-gray-700">
-                            <div className="font-semibold mb-1">
-                                Purpose: {request.purpose}
-                            </div>
+                        <TableCell className="py-2 text-sm text-gray-700">
+
+
                             <div className="text-gray-600 text-sm">
                                 Requester:{" "}
                                 <span className="font-medium">
@@ -53,6 +52,18 @@ const RequestsTable = ({ requests, selectedRequest, onSelectRequest }) => {
                             </div>
                             <div className="text-xs text-gray-500 mt-1">
                                 Requested on: {formatDate(request.requestdate)}
+                            </div>
+                            <div
+                                className={`font-semibold mb-1 ${request.xstatus === "Pending"
+                                    ? "text-yellow-600"
+                                    : request.xstatus === "Acknowledged"
+                                        ? "text-green-600"
+                                        : request.xstatus === "Served"
+                                            ? "text-blue-600"
+                                            : "text-gray-700"
+                                    }`}
+                            >
+                                {request.xstatus}
                             </div>
                         </TableCell>
                     </TableRow>

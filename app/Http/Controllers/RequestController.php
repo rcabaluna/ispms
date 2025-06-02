@@ -27,7 +27,7 @@ class RequestController extends Controller
         $data = $request->all();
 
 
-        $requestsummaryid = RequestSummaryModel::create($data['summary'])->id;
+        $requestsummaryid = RequestSummaryModel::create($data['summary'])->requestsummaryid;
 
         foreach ($data['details'] as $details) {
             $details['requestsummaryid'] = $requestsummaryid;
