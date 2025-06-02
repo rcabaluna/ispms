@@ -38,6 +38,8 @@ Route::get('items/request/sent', [RequestController::class, 'requestSent'])->nam
 
 // Staff Requests
 Route::get('inventory/requests', [InventoryRequestsController::class, 'index']);
+Route::put('inventory/requests/acknowledge/{requestsummaryid}', [InventoryRequestsController::class, 'acknowledge'])->name('requests.acknowledge');
+
 Route::get('inventory/requests/details/{requestsummaryid}', [InventoryRequestsController::class, 'show'])->name('requests.show');
 
 

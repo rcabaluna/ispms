@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 class RequestSummaryModel extends Model
 {
     protected $table = 'tblrequest_summary';
+    protected $primaryKey = 'requestsummaryid';
+    public $incrementing = true;
+    protected $keyType = 'int';
+
 
     protected $fillable = [
         'requester',

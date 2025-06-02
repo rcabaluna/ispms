@@ -8,12 +8,28 @@ import {
     TableCell,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { router } from "@inertiajs/react";
 
 const RequestsDetails = ({ selectedRequest }) => {
     const [requestDetails, setRequestDetails] = useState(null);
     const [loading, setLoading] = useState(false);
     const [scratchedItems, setScratchedItems] = useState([]);
-    const [isAcknowledged, setIsAcknowledged] = useState(false);
+    const [remarks, setRemarks] = useState("");
+    const [checkAll, setCheckAll] = useState(false);
+
+    const isAcknowledged = selectedRequest?.xstatus === "Acknowledged";
 
     useEffect(() => {
         if (!selectedRequest) {
@@ -33,13 +49,15 @@ const RequestsDetails = ({ selectedRequest }) => {
                 );
 
                 if (!response.ok) {
-                    throw new Error(`Error ${response.status}: ${response.statusText}`);
+                    throw new Error(
+                        `Error ${response.status}: ${response.statusText}`
+                    );
                 }
 
                 const data = await response.json();
                 setRequestDetails(data);
                 setScratchedItems([]);
-                setIsAcknowledged(false); // reset when changing request
+                setCheckAll(false);
             } catch (error) {
                 if (error.name !== "AbortError") {
                     console.error("Failed to fetch request details:", error);
@@ -51,7 +69,6 @@ const RequestsDetails = ({ selectedRequest }) => {
         };
 
         fetchRequestDetails();
-
         return () => controller.abort();
     }, [selectedRequest]);
 
@@ -65,9 +82,50 @@ const RequestsDetails = ({ selectedRequest }) => {
         );
     };
 
-    const allItemsScratched =
-        requestDetails?.items?.length > 0 &&
-        scratchedItems.length === requestDetails.items.length;
+    const toggleAll = () => {
+        if (!isAcknowledged) return;
+        if (checkAll) {
+            setScratchedItems([]);
+            setCheckAll(false);
+        } else {
+            const allIndexes = requestDetails?.items?.map((_, i) => i) || [];
+            setScratchedItems(allIndexes);
+            setCheckAll(true);
+        }
+    };
+
+    const handleAcknowledge = async () => {
+        try {
+            const response = await fetch(
+                `/inventory/requests/acknowledge/${selectedRequest.requestsummaryid}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-Requested-With": "XMLHttpRequest",
+                        "X-CSRF-TOKEN": document
+                            .querySelector('meta[name="csrf-token"]')
+                            .getAttribute("content"),
+                    },
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Failed to acknowledge request.");
+            }
+
+            const result = await response.json();
+            console.log(result.message);
+        } catch (error) {
+            console.error(error.message);
+            alert("An error occurred while acknowledging the request.");
+        }
+    };
+
+    const handleMarkAsServed = () => {
+        alert(`Marked as served!\nRemarks: ${remarks}`);
+        // You can send this to your API if needed
+    };
 
     if (!selectedRequest) {
         return <div className="text-gray-500">No request selected</div>;
@@ -78,7 +136,9 @@ const RequestsDetails = ({ selectedRequest }) => {
     }
 
     if (!requestDetails) {
-        return <div className="text-red-500">Failed to load request details.</div>;
+        return (
+            <div className="text-red-500">Failed to load request details.</div>
+        );
     }
 
     const { purpose, requestdate, requester_details, items } = requestDetails;
@@ -88,12 +148,31 @@ const RequestsDetails = ({ selectedRequest }) => {
             <div className="flex items-center justify-between mb-4">
                 <p className="text-lg font-medium">Requests</p>
                 {!isAcknowledged && (
-                    <Button onClick={() => setIsAcknowledged(true)}>Acknowledge</Button>
+                    <Button onClick={handleAcknowledge}>Acknowledge</Button>
                 )}
-                {isAcknowledged && allItemsScratched && (
-                    <Button onClick={() => alert("Marked as served!")}>
-                        Mark as Served
-                    </Button>
+                {isAcknowledged && (
+                    <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <Button>Mark as Served</Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                    Confirm Mark as Served
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    Are you sure you want to mark this request
+                                    as served? This action cannot be undone.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={handleMarkAsServed}>
+                                    Continue
+                                </AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
                 )}
             </div>
 
@@ -105,7 +184,8 @@ const RequestsDetails = ({ selectedRequest }) => {
                     </p>
                     <p>
                         <strong>Requester:</strong>{" "}
-                        {requester_details?.firstname} {requester_details?.surname}{" "}
+                        {requester_details?.firstname}{" "}
+                        {requester_details?.surname}{" "}
                         {requester_details?.nameExtension}
                     </p>
                     <p>
@@ -128,6 +208,13 @@ const RequestsDetails = ({ selectedRequest }) => {
                     <Table>
                         <TableHeader>
                             <TableRow>
+                                <TableHead>
+                                    <Checkbox
+                                        checked={checkAll}
+                                        onCheckedChange={toggleAll}
+                                        disabled={!isAcknowledged}
+                                    />
+                                </TableHead>
                                 <TableHead>Item</TableHead>
                                 <TableHead>Requested Qty</TableHead>
                                 <TableHead>Issued Qty</TableHead>
@@ -135,21 +222,61 @@ const RequestsDetails = ({ selectedRequest }) => {
                         </TableHeader>
                         <TableBody>
                             {items?.map((item, idx) => {
-                                const isScratched = scratchedItems.includes(idx);
+                                const isScratched =
+                                    scratchedItems.includes(idx);
+                                const qtyDiff =
+                                    item.issued_quantity - item.quantity;
+                                const isWarning = qtyDiff <= 5 && qtyDiff > 0;
+                                const isDanger = qtyDiff <= 0;
+
+                                const rowClass = `${
+                                    isDanger ? "bg-red-100" : ""
+                                } ${isWarning ? "bg-yellow-100" : ""}`;
+                                const textClass = `${
+                                    isScratched
+                                        ? "line-through text-gray-500"
+                                        : ""
+                                } ${isDanger ? "text-red-500" : ""} ${
+                                    isWarning ? "text-yellow-600" : ""
+                                }`;
+
                                 return (
                                     <TableRow
                                         key={idx}
-                                        onClick={() => toggleScratch(idx)}
-                                        className={`cursor-pointer ${!isAcknowledged ? "opacity-50 pointer-events-none" : ""}`}
+                                        className={`cursor-pointer ${
+                                            !isAcknowledged
+                                                ? "opacity-50 pointer-events-none"
+                                                : ""
+                                        } ${rowClass}`}
                                     >
-                                        <TableCell className={isScratched ? "line-through text-gray-500" : ""}>
+                                        <TableCell
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            <Checkbox
+                                                checked={isScratched}
+                                                onCheckedChange={() =>
+                                                    toggleScratch(idx)
+                                                }
+                                                disabled={!isAcknowledged}
+                                            />
+                                        </TableCell>
+                                        <TableCell
+                                            onClick={() => toggleScratch(idx)}
+                                            className={textClass}
+                                        >
                                             {item.item}
                                         </TableCell>
-                                        <TableCell className={isScratched ? "line-through text-gray-500" : ""}>
-                                            {item.quantity}
-                                        </TableCell>
-                                        <TableCell className={isScratched ? "line-through text-gray-500" : ""}>
+                                        <TableCell
+                                            onClick={() => toggleScratch(idx)}
+                                            className={textClass}
+                                        >
                                             {item.issued_quantity}
+                                        </TableCell>
+                                        <TableCell
+                                            onClick={() => toggleScratch(idx)}
+                                            className={textClass}
+                                        >
+                                            {item.quantity}
                                         </TableCell>
                                     </TableRow>
                                 );
@@ -157,6 +284,24 @@ const RequestsDetails = ({ selectedRequest }) => {
                         </TableBody>
                     </Table>
                 </div>
+
+                {isAcknowledged && (
+                    <div className="mt-4">
+                        <label
+                            htmlFor="remarks"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                            Remarks:
+                        </label>
+                        <textarea
+                            id="remarks"
+                            value={remarks}
+                            onChange={(e) => setRemarks(e.target.value)}
+                            className="w-full border border-gray-300 rounded p-2 resize-y min-h-[100px]"
+                            placeholder="Remarks"
+                        />
+                    </div>
+                )}
             </div>
         </>
     );

@@ -86,4 +86,20 @@ class InventoryRequestsController extends Controller
             ]);
     }
 
+    public function acknowledge($requestsummaryid)
+    {
+
+        // Acknowledge the request summary by updating its status
+        $requestSummary = RequestSummaryModel::find($requestsummaryid); 
+        
+        
+        if ($requestSummary) {
+            $requestSummary->xstatus = 'Acknowledged'; // or whatever status you want to set
+            $requestSummary->save();
+
+            return response()->json(['message' => 'Request acknowledged successfully.']);
+        }
+        return response()->json(['message' => 'Request summary not found.'], 404);
+    }
+
 }

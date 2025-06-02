@@ -33,8 +33,9 @@ class StockinController extends Controller
         $ponumber = $request->input('ponumber');
         $file = $request->input('excel_data');
 
+
         StockinModel::create([
-            'ponumber' => $ponumber,
+            'POnumber' => $ponumber,
         ]);
 
         foreach ($file as $row) {

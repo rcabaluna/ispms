@@ -37,7 +37,6 @@ const EmployeesTable = ({
                 }
 
                 const data = await response.json();
-                console.log("Fetched RIS data:", data);
                 onRISFetched(data);
             } catch (err) {
                 if (err.name !== "AbortError") {
