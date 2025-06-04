@@ -8,6 +8,8 @@ class AuthModel extends Authenticatable
 {
     protected $table = 'tbluseraccounts';
 
+    protected $primaryKey = 'useraccountid';
+
     protected $fillable = [
         'username',
         'password',

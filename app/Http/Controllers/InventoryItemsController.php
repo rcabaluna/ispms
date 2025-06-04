@@ -15,14 +15,16 @@ class InventoryItemsController extends Controller
     {
 
         $items = DB::table('tblinventory_items')
-            ->select(
-                'stock_no',
-                'item',
-                DB::raw('ROUND(SUM(quantity), 0) as total_quantity'),
-                DB::raw('ROUND(AVG(unit_cost), 2) as average_cost')
-            )
-            ->groupBy('stock_no', 'item')
-            ->get();
+    ->select(
+        'stock_no',
+        'item',
+        DB::raw('ROUND(SUM(quantity), 0) AS total_quantity'),
+        DB::raw('(SELECT COALESCE(SUM(b.quantity), 0) FROM tblrequest_details b WHERE b.is_served = 1 AND b.stock_no = tblinventory_items.stock_no) AS served_quantity'),
+        DB::raw('(ROUND(SUM(quantity), 0) - (SELECT COALESCE(SUM(b.quantity), 0) FROM tblrequest_details b WHERE b.is_served = 1 AND b.stock_no = tblinventory_items.stock_no)) AS remaining_quantity'),
+        DB::raw('ROUND(AVG(unit_cost), 2) AS average_cost')
+    )
+    ->groupBy('stock_no', 'item')
+    ->get();
 
 
         return inertia('inventory-items/page', [

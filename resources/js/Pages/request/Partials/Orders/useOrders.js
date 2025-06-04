@@ -32,7 +32,7 @@ const useOrders = ({ employees, selectedItem, onItemAdded }) => {
     }, [supervisorName]);
 
     useEffect(() => {
-        if (selectedItem && requester) {
+        if (selectedItem) {
             const exists = items.find(
                 (i) => i.invitemsid === selectedItem.invitemsid
             );
@@ -44,7 +44,7 @@ const useOrders = ({ employees, selectedItem, onItemAdded }) => {
                 onItemAdded?.();
             }
         }
-    }, [selectedItem, requester]);
+    }, [selectedItem]);
 
     const updateQuantity = (index, delta) => {
         setItems((prev) =>

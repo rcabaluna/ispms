@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\RequestDetailsModel;
 use App\Models\RequestSummaryModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\RequestAcknowledgedMail;
+use App\Mail\RequestReadyForPickupMail;
+
 
 class InventoryRequestsController extends Controller
 {
@@ -24,12 +29,13 @@ class InventoryRequestsController extends Controller
                 a.middleInitial, 
                 c.positionDesc
             FROM tblemppersonal a 
-            JOIN tblempposition b ON b.empNumber = a.empNumber
-            JOIN tblposition c ON c.positionCode = b.positionCode
+            LEFT JOIN tblempposition b ON b.empNumber = a.empNumber
+            LEFT JOIN tblposition c ON c.positionCode = b.positionCode
         "))->keyBy('empNumber');
 
+
         // Load all request summaries
-        $requests = RequestSummaryModel::get()->toArray();
+        $requests = RequestSummaryModel::orderBy('requestsummaryid','DESC')->get()->toArray();
 
 
         // Merge requests with both requester and supervisor info
@@ -64,23 +70,17 @@ class InventoryRequestsController extends Controller
         $data = DB::table('tblrequest_details as a')
             ->join('tblinventory_items as b', 'b.stock_no', '=', 'a.stock_no')
             ->leftJoin('tblrequest_summary as s', 's.requestsummaryid', '=', 'a.requestsummaryid')
-            ->leftJoin('tblris as c', function($join) {
-                $join->on('c.empNumber', '=', 's.supervisor')
-                    ->on('c.stock_no', '=', 'b.stock_no');
-            })
             ->where('a.requestsummaryid', $requestsummaryid)
             ->select(
                 'a.*',
-                'b.item',
-                DB::raw('COALESCE(c.quantity, 0) as issued_quantity')
+                'b.item'
             )
             ->groupBy(
                 'b.stock_no',
                 'a.requestdetailsid',
                 'a.requestsummaryid',
                 'a.stock_no',
-                'b.item',
-                'c.empNumber'
+                'b.item'
             )
             ->get();
 
@@ -89,20 +89,64 @@ class InventoryRequestsController extends Controller
             ]);
     }
 
+
     public function acknowledge($requestsummaryid)
     {
+        $requestSummary = RequestSummaryModel::find($requestsummaryid);
 
-        // Acknowledge the request summary by updating its status
-        $requestSummary = RequestSummaryModel::find($requestsummaryid); 
-        
-        
         if ($requestSummary) {
-            $requestSummary->xstatus = 'Acknowledged'; // or whatever status you want to set
+            $requestSummary->xstatus = 'Acknowledged';
             $requestSummary->save();
 
-            return response()->json(['message' => 'Request acknowledged successfully.']);
+            $recipientEmail = $this->get_employee_email($requestSummary->requester);
+
+
+            $data = [
+                'requestSummary' => $requestSummary,
+            ];
+
+            Mail::to($recipientEmail)->send(new RequestAcknowledgedMail($data));
+
+            return response()->json(['message' => 'Request acknowledged and email sent.']);
         }
+
         return response()->json(['message' => 'Request summary not found.'], 404);
+    }
+
+
+
+    public function serve(Request $request, int $requestsummaryid)
+    {
+        $data = $request->all();
+        $items = $data['toServe'];
+
+        foreach ($items as $item) {
+            RequestDetailsModel::where('requestdetailsid', $item['requestdetailsid'])
+                ->update(['is_served' => 1]);
+        }
+
+        $requestSummary = RequestSummaryModel::where('requestsummaryid', $requestsummaryid)->first();
+        $requestSummary->xstatus = 'Served';
+        $requestSummary->remarks = $data['remarks'];
+        $requestSummary->save();
+
+        // Example recipient
+        $recipientEmail = $this->get_employee_email($requestSummary->requester);
+
+
+        Mail::to($recipientEmail)->send(new RequestReadyForPickupMail([
+            'requestSummary' => $requestSummary
+        ]));
+
+        return response()->json(['message' => 'Request has been served and email sent successfully.']);
+    }
+
+    public function get_employee_email($empNumber)
+    {
+        return DB::connection('mysql2')->table('tblemppersonal')
+            ->where('empNumber', $empNumber)
+            ->select(DB::raw('COALESCE(work_email, email) as email'))
+            ->value('email'); // this gets the single email value
     }
 
 }

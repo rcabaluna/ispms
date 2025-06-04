@@ -1,45 +1,64 @@
 import React, { useEffect, useState } from "react";
 import {
-    Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
+    Table,
+    TableHeader,
+    TableBody,
+    TableRow,
+    TableHead,
+    TableCell,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-    AlertDialog, AlertDialogAction, AlertDialogCancel,
-    AlertDialogContent, AlertDialogDescription,
-    AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import { ShowToast } from "@/Layouts/ShowToast";
 
-const RequestsDetails = ({ selectedRequest, setSelectedRequest, setRequestsData, requestsData }) => {
+const RequestsDetails = ({
+    selectedRequest,
+    setSelectedRequest,
+    setRequestsData,
+    requestsData,
+}) => {
     const [requestDetails, setRequestDetails] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [scratchedItems, setScratchedItems] = useState([]);
+    const [toServe, setToServe] = useState([]);
     const [remarks, setRemarks] = useState("");
     const [checkAll, setCheckAll] = useState(false);
+    const [processingAcknowledge, setProcessingAcknowledge] = useState(false);
+    const [processingServe, setProcessingServe] = useState(false);
 
     const isAcknowledged = selectedRequest?.xstatus === "Acknowledged";
+    const isServed = selectedRequest?.xstatus === "Served";
 
     useEffect(() => {
         if (!selectedRequest) return setRequestDetails(null);
         const controller = new AbortController();
-        const { requestsummaryid } = selectedRequest;
 
         const fetchRequestDetails = async () => {
             setLoading(true);
             try {
-                const response = await fetch(`/inventory/requests/details/${requestsummaryid}`, {
-                    signal: controller.signal,
-                });
-                if (!response.ok) throw new Error(`Error ${response.status}`);
-                const data = await response.json();
+                const res = await fetch(
+                    `/inventory/requests/details/${selectedRequest.requestsummaryid}`,
+                    { signal: controller.signal }
+                );
+                if (!res.ok) throw new Error("Failed to fetch request details");
+                const data = await res.json();
                 setRequestDetails(data);
-                setScratchedItems([]);
+                setToServe([]);
                 setCheckAll(false);
-            } catch (error) {
-                if (error.name !== "AbortError") console.error("Fetch error:", error);
+            } catch (err) {
+                if (err.name !== "AbortError") console.error(err);
             } finally {
                 setLoading(false);
             }
@@ -51,28 +70,69 @@ const RequestsDetails = ({ selectedRequest, setSelectedRequest, setRequestsData,
 
     const toggleScratch = (index) => {
         if (!isAcknowledged) return;
-        setScratchedItems((prev) =>
-            prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
-        );
+        const item = requestDetails.items[index];
+        const itemObj = {
+            stockno: item.stockno,
+            requestdetailsid: item.requestdetailsid,
+        };
+
+        setToServe((prev) => {
+            const exists = prev.some(
+                (i) =>
+                    i.stockno === itemObj.stockno &&
+                    i.requestdetailsid === itemObj.requestdetailsid
+            );
+            return exists
+                ? prev.filter(
+                      (i) =>
+                          !(
+                              i.stockno === itemObj.stockno &&
+                              i.requestdetailsid === itemObj.requestdetailsid
+                          )
+                  )
+                : [...prev, itemObj];
+        });
     };
 
     const toggleAll = () => {
         if (!isAcknowledged) return;
-        const allIndexes = requestDetails?.items?.map((_, i) => i) || [];
-        setScratchedItems(checkAll ? [] : allIndexes);
+
+        if (checkAll) {
+            setToServe([]);
+        } else {
+            const allItems = requestDetails.items.map((item) => ({
+                stockno: item.stockno,
+                requestdetailsid: item.requestdetailsid,
+            }));
+            setToServe(allItems);
+        }
+
         setCheckAll(!checkAll);
     };
 
     const handleAcknowledge = async () => {
+        setProcessingAcknowledge(true);
         try {
-            const res = await fetch(`/inventory/requests/acknowledge/${selectedRequest.requestsummaryid}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
-                },
-            });
+            const res = await fetch(
+                `/inventory/requests/acknowledge/${selectedRequest.requestsummaryid}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document.querySelector(
+                            'meta[name="csrf-token"]'
+                        ).content,
+                    },
+                }
+            );
+
             if (!res.ok) throw new Error("Acknowledge failed");
+
+            ShowToast({
+                title: "Success!",
+                description: "Request acknowledged successfully.",
+                className: "bg-green-500 text-white",
+            });
 
             setRequestsData((prev) =>
                 prev.map((r) =>
@@ -82,145 +142,252 @@ const RequestsDetails = ({ selectedRequest, setSelectedRequest, setRequestsData,
                 )
             );
 
-            setSelectedRequest((prev) => ({ ...prev, xstatus: "Acknowledged" }));
+            setSelectedRequest((prev) => ({
+                ...prev,
+                xstatus: "Acknowledged",
+            }));
         } catch (err) {
-            console.error(err);
-            alert("Error acknowledging request");
+            ShowToast({
+                title: "Success!",
+                description: err,
+                className: "bg-green-500 text-white",
+            });
+        } finally {
+            setProcessingAcknowledge(false);
         }
     };
 
     const handleMarkAsServed = async () => {
+        setProcessingServe(true);
         try {
-            const res = await fetch(`/inventory/requests/serve/${selectedRequest.requestsummaryid}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
-                },
-                body: JSON.stringify({ remarks }),
+            const response = await fetch(
+                `/inventory/requests/serve/${selectedRequest.requestsummaryid}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document.querySelector(
+                            'meta[name="csrf-token"]'
+                        ).content,
+                    },
+                    body: JSON.stringify({
+                        remarks: remarks,
+                        toServe: toServe,
+                        summary: selectedRequest,
+                    }),
+                }
+            );
+
+            if (!response.ok) throw new Error("Failed to serve request");
+
+            const data = await response.json();
+
+            ShowToast({
+                title: "Success!",
+                description: data.message,
+                className: "bg-green-500 text-white",
             });
-            if (!res.ok) throw new Error("Serve failed");
 
             setRequestsData((prev) =>
                 prev.map((r) =>
                     r.requestsummaryid === selectedRequest.requestsummaryid
-                        ? { ...r, xstatus: "Served" }
+                        ? { ...r, xstatus: "Served", remarks }
                         : r
                 )
             );
 
-            alert("Marked as served");
+            setSelectedRequest((prev) => ({
+                ...prev,
+                xstatus: "Served",
+                remarks,
+            }));
+
+            const refreshed = await fetch(
+                `/inventory/requests/details/${selectedRequest.requestsummaryid}`
+            );
+            if (!refreshed.ok) throw new Error("Refresh failed");
+            const freshData = await refreshed.json();
+            setRequestDetails(freshData);
+            setToServe([]);
+            setCheckAll(false);
         } catch (err) {
-            console.error(err);
-            alert("Error marking as served");
+            ShowToast({
+                title: "Error!",
+                description: err.message || "Something went wrong",
+                className: "bg-red-500 text-white",
+            });
+        } finally {
+            setProcessingServe(false);
         }
     };
 
-    if (!selectedRequest) return <div className="text-sm text-muted-foreground">No request selected.</div>;
-    if (loading) return <div className="text-sm text-muted-foreground">Loading...</div>;
-    if (!requestDetails) return <div className="text-sm text-destructive">Failed to load details.</div>;
+    if (!selectedRequest)
+        return (
+            <div className="text-sm text-muted-foreground">
+                No request selected.
+            </div>
+        );
+    if (loading)
+        return <div className="text-sm text-muted-foreground">Loading...</div>;
+    if (!requestDetails)
+        return (
+            <div className="text-sm text-destructive">
+                Failed to load details.
+            </div>
+        );
 
     const { items } = requestDetails;
     const requester = selectedRequest.requester_details;
     const supervisor = selectedRequest.supervisor_details;
 
-    const formatName = (person) =>
-        [person?.firstname, person?.middleInitial && `${person.middleInitial}.`, person?.surname, person?.nameExtension]
-            .filter(Boolean).join(" ");
+    const formatName = (p) =>
+        [
+            p?.firstname,
+            p?.middleInitial && `${p.middleInitial}.`,
+            p?.surname,
+            p?.nameExtension,
+        ]
+            .filter(Boolean)
+            .join(" ");
 
     return (
         <div className="border bg-background p-4 shadow-sm space-y-4 text-sm">
             <div className="flex justify-between items-center">
-                <h2 className="text-lg font-semibold text-primary">Request Summary</h2>
-                {!isAcknowledged ? (
-                    <Button onClick={handleAcknowledge}>Acknowledge</Button>
-                ) : (
+                <h2 className="text-lg font-semibold text-primary">
+                    Request Summary
+                </h2>
+                {!isAcknowledged && !isServed ? (
+                    <Button
+                        onClick={handleAcknowledge}
+                        disabled={processingAcknowledge}
+                    >
+                        {processingAcknowledge
+                            ? "Processing..."
+                            : "Acknowledge"}
+                    </Button>
+                ) : isAcknowledged ? (
                     <AlertDialog>
                         <AlertDialogTrigger asChild>
-                            <Button variant="destructive">Mark as Served</Button>
+                            <Button disabled={processingServe}>
+                                {processingServe
+                                    ? "Processing..."
+                                    : "Mark as Served"}
+                            </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                             <AlertDialogHeader>
-                                <AlertDialogTitle>Confirm Serve</AlertDialogTitle>
+                                <AlertDialogTitle>
+                                    Confirm Serve
+                                </AlertDialogTitle>
                                 <AlertDialogDescription>
-                                    Proceed to mark this request as served? This action is final.
+                                    Proceed to mark this request as served? This
+                                    action is final.
                                 </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={handleMarkAsServed}>Confirm</AlertDialogAction>
+                                <AlertDialogCancel disabled={processingServe}>
+                                    Cancel
+                                </AlertDialogCancel>
+                                <AlertDialogAction
+                                    onClick={handleMarkAsServed}
+                                    disabled={processingServe}
+                                >
+                                    Confirm
+                                </AlertDialogAction>
                             </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>
-                )}
+                ) : null}
             </div>
 
             <Separator />
 
             <div className="space-y-1">
-                <p><strong>Purpose:</strong> {selectedRequest.purpose}</p>
-                <p><strong>Requester:</strong> {formatName(requester)}</p>
-                <p><strong>Supervisor:</strong> {formatName(supervisor)}</p>
-                <p><strong>Request Date:</strong> {new Date(selectedRequest.requestdate).toLocaleDateString()}</p>
+                <p>
+                    <strong>Purpose:</strong> {selectedRequest.purpose}
+                </p>
+                <p>
+                    <strong>Requester:</strong> {formatName(requester)}
+                </p>
+                <p>
+                    <strong>Supervisor:</strong> {formatName(supervisor)}
+                </p>
+                <p>
+                    <strong>Request Date:</strong>{" "}
+                    {new Date(selectedRequest.requestdate).toLocaleDateString(
+                        "en-US",
+                        {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                        }
+                    )}
+                </p>
             </div>
 
             <Separator />
 
             <div>
                 <h3 className="font-semibold text-primary mb-2">Items</h3>
-                {!isAcknowledged && (
-                    <p className="text-xs text-muted-foreground mb-2">
-                        Click “Acknowledge” to serve items.
-                    </p>
-                )}
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead>
-                                <Checkbox
-                                    checked={checkAll}
-                                    onCheckedChange={toggleAll}
-                                    disabled={!isAcknowledged}
-                                />
-                            </TableHead>
+                            <TableHead>Served</TableHead>
                             <TableHead>Item</TableHead>
-                            <TableHead>Issued</TableHead>
                             <TableHead>Requested</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {items?.map((item, idx) => {
-                            const isScratched = scratchedItems.includes(idx);
-                            const diff = item.issued_quantity - item.quantity;
-                            const isWarning = diff <= 5 && diff > 0;
-                            const isDanger = diff <= 0;
-
-                            const rowStyle = cn(
-                                isDanger && "bg-red-50 text-red-700",
-                                isWarning && "bg-yellow-50 text-yellow-700",
-                                !isAcknowledged && "opacity-60"
-                            );
+                        {items.map((item, index) => {
+                            const isServedItem = item.is_served === 1;
+                            const isScratched =
+                                isServedItem ||
+                                toServe.some(
+                                    (i) =>
+                                        i.stockno === item.stockno &&
+                                        i.requestdetailsid ===
+                                            item.requestdetailsid
+                                );
 
                             const textStyle = cn(
-                                isScratched && "line-through text-muted-foreground"
+                                selectedRequest?.xstatus !== "Served" &&
+                                    isScratched &&
+                                    "line-through text-muted-foreground"
                             );
 
                             return (
-                                <TableRow key={idx} className={cn("cursor-pointer", rowStyle)}>
-                                    <TableCell onClick={(e) => e.stopPropagation()}>
+                                <TableRow
+                                    key={index}
+                                    className="cursor-pointer"
+                                >
+                                    <TableCell
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
                                         <Checkbox
                                             checked={isScratched}
-                                            onCheckedChange={() => toggleScratch(idx)}
+                                            onCheckedChange={() =>
+                                                isAcknowledged &&
+                                                toggleScratch(index)
+                                            }
                                             disabled={!isAcknowledged}
                                         />
                                     </TableCell>
-                                    <TableCell onClick={() => toggleScratch(idx)} className={textStyle}>
+                                    <TableCell
+                                        onClick={() =>
+                                            isAcknowledged &&
+                                            toggleScratch(index)
+                                        }
+                                        className={textStyle}
+                                    >
                                         {item.item}
                                     </TableCell>
-                                    <TableCell onClick={() => toggleScratch(idx)} className={textStyle}>
-                                        {item.issued_quantity}
-                                    </TableCell>
-                                    <TableCell onClick={() => toggleScratch(idx)} className={textStyle}>
+                                    <TableCell
+                                        onClick={() =>
+                                            isAcknowledged &&
+                                            toggleScratch(index)
+                                        }
+                                        className={textStyle}
+                                    >
                                         {item.quantity}
                                     </TableCell>
                                 </TableRow>
@@ -230,12 +397,21 @@ const RequestsDetails = ({ selectedRequest, setSelectedRequest, setRequestsData,
                 </Table>
             </div>
 
+            {selectedRequest?.xstatus === "Served" && (
+                <div className="text-sm text-muted-foreground mt-4">
+                    <strong>Remarks:</strong> {selectedRequest?.remarks || "—"}
+                </div>
+            )}
+
             {isAcknowledged && (
                 <>
                     <Separator />
                     <div className="space-y-1">
-                        <label htmlFor="remarks" className="text-sm font-medium text-muted-foreground">
-                            Remarks
+                        <label
+                            htmlFor="remarks"
+                            className="text-sm font-medium text-muted-foreground"
+                        >
+                            Remarks from Supply Office
                         </label>
                         <textarea
                             id="remarks"

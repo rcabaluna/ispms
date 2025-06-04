@@ -8,10 +8,14 @@ class RequestDetailsModel extends Model
 {
     protected $table = 'tblrequest_details';
 
+     protected $primaryKey = 'requestdetailsid';
+
+
     protected $fillable = [
         'requestsummaryid',
         'stock_no',
-        'quantity'
+        'quantity',
+        'is_served'
     ];
 
     public $timestamps = false;

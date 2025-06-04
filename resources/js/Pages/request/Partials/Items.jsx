@@ -20,7 +20,7 @@ const Items = ({ items, onSelectItem }) => {
     );
 
     const handleSelect = (item) => {
-        setSelectedItemId(item.invitemsid);
+        setSelectedItemId(item.stock_no);
         onSelectItem?.(item);
     };
 
@@ -47,12 +47,18 @@ const Items = ({ items, onSelectItem }) => {
                     {filteredItems.length > 0 ? (
                         filteredItems.map((item) => (
                             <TableRow
-                                key={item.invitemsid}
-                                onClick={() => handleSelect(item)}
-                                className={`cursor-pointer transition-colors ${
-                                    selectedItemId === item.invitemsid
+                                key={item.stock_no}
+                                onClick={() =>
+                                    item.quantity > 0 && handleSelect(item)
+                                }
+                                className={`transition-colors ${
+                                    item.quantity > 0
+                                        ? "cursor-pointer hover:bg-sky-50"
+                                        : "opacity-60 cursor-not-allowed"
+                                } ${
+                                    selectedItemId === item.stock_no
                                         ? "bg-sky-200"
-                                        : "hover:bg-sky-50"
+                                        : ""
                                 }`}
                             >
                                 <TableCell className="text-sm text-sky-700">
@@ -60,9 +66,15 @@ const Items = ({ items, onSelectItem }) => {
                                         {item.item}
                                     </span>
                                     <br />
-                                    <span className="text-xs text-gray-500">
-                                        Stock No: {item.stock_no} &mdash; Qty:{" "}
-                                        {item.quantity}
+                                    <span className="text-xs">
+                                        Stock No: {item.stock_no} &mdash;{" "}
+                                        {item.quantity > 0 ? (
+                                            <>Qty: {item.quantity}</>
+                                        ) : (
+                                            <span className="text-red-600 font-semibold">
+                                                Out of stock
+                                            </span>
+                                        )}
                                     </span>
                                 </TableCell>
                             </TableRow>

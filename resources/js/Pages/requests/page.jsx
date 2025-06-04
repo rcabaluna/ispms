@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import MainLayout from "@/Layouts/MainLayout";
 import RequestsTable from "./Partials/RequestsTable";
 import {
@@ -21,7 +21,6 @@ const Requests = ({ requests }) => {
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [requestsData, setRequestsData] = useState(requests);
 
-
     const years = Array.from(
         { length: 10 },
         (_, i) => `${currentDate.getFullYear() - i}`
@@ -31,6 +30,15 @@ const Requests = ({ requests }) => {
         new Date(2000, monthNumber - 1).toLocaleString("default", {
             month: "long",
         });
+
+    const filteredRequests = useMemo(() => {
+        return requestsData.filter((req) => {
+            const reqDate = new Date(req.requestdate);
+            const reqMonth = String(reqDate.getMonth() + 1).padStart(2, "0");
+            const reqYear = String(reqDate.getFullYear());
+            return reqMonth === selectedMonth && reqYear === selectedYear;
+        });
+    }, [requestsData, selectedMonth, selectedYear]);
 
     return (
         <>
@@ -43,7 +51,10 @@ const Requests = ({ requests }) => {
                             <p className="mb-2 font-medium">Filters:</p>
                             <div className="flex gap-2">
                                 <Select
-                                    onValueChange={setSelectedMonth}
+                                    onValueChange={(val) => {
+                                        setSelectedMonth(val);
+                                        setSelectedRequest(null);
+                                    }}
                                     value={selectedMonth}
                                 >
                                     <SelectTrigger className="w-full">
@@ -67,7 +78,10 @@ const Requests = ({ requests }) => {
                                 </Select>
 
                                 <Select
-                                    onValueChange={setSelectedYear}
+                                    onValueChange={(val) => {
+                                        setSelectedYear(val);
+                                        setSelectedRequest(null);
+                                    }}
                                     value={selectedYear}
                                 >
                                     <SelectTrigger className="w-full">
@@ -84,32 +98,29 @@ const Requests = ({ requests }) => {
                             </div>
                         </div>
 
+                        {/* Request List */}
                         <div
                             className="overflow-y-auto"
                             style={{ maxHeight: "calc(100vh - 100px)" }}
                         >
                             <RequestsTable
-                                requests={requestsData}
+                                requests={filteredRequests}
                                 month={selectedMonth}
                                 year={selectedYear}
                                 selectedRequest={selectedRequest}
                                 onSelectRequest={setSelectedRequest}
                             />
-
                         </div>
                     </div>
 
                     {/* Main Content */}
                     <div className="w-[80%] px-6 py-4 space-y-4">
-
-
                         <RequestsDetails
                             selectedRequest={selectedRequest}
                             setSelectedRequest={setSelectedRequest}
                             setRequestsData={setRequestsData}
                             requestsData={requestsData}
                         />
-
                     </div>
                 </div>
             </div>

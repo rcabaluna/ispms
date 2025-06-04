@@ -70,10 +70,36 @@ export const columns = [
     {
         accessorKey: "total_quantity",
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Total Quantity" />
+            <DataTableColumnHeader
+                column={column}
+                title="Total Quantity (Stock-In)"
+            />
         ),
         cell: ({ row }) => (
             <div className="text-center">{row.getValue("total_quantity")}</div>
+        ),
+    },
+    {
+        accessorKey: "served_quantity",
+        header: ({ column }) => (
+            <DataTableColumnHeader
+                column={column}
+                title="Served Quantity (Stock-Out)"
+            />
+        ),
+        cell: ({ row }) => (
+            <div className="text-center">{row.getValue("served_quantity")}</div>
+        ),
+    },
+    {
+        accessorKey: "remaining_quantity",
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Remaining Quantity" />
+        ),
+        cell: ({ row }) => (
+            <div className="text-center">
+                {row.getValue("remaining_quantity")}
+            </div>
         ),
     },
     {

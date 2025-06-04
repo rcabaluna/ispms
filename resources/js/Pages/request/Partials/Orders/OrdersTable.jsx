@@ -29,7 +29,7 @@ const OrdersTable = ({ items, updateQuantity, removeItem }) => {
                 <TableBody>
                     {items.length ? (
                         items.map((item, idx) => (
-                            <TableRow key={item.invitemsid}>
+                            <TableRow key={item.stock_no}>
                                 <TableCell className="py-4 px-6 text-sky-800">
                                     {item.stock_no}
                                 </TableCell>

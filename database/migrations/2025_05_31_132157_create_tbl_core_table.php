@@ -59,21 +59,10 @@ class CreateTblCoreTable extends Migration
             $table->boolean('is_served')->default(0);
             $table->foreign('requestsummaryid')->references('requestsummaryid')->on('tblrequest_summary')->onDelete('cascade')->onUpdate('cascade');
         });
-
-        Schema::create('tblris', function (Blueprint $table) {
-            $table->id('risid');
-            $table->string('empNumber')->nullable();
-            $table->string('stock_no', 45);
-            $table->double('quantity', 15, 2);
-            $table->integer('month');
-            $table->integer('year');
-            $table->timestamps();
-        });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('tblris');
         Schema::dropIfExists('tblrequest_details');
         Schema::dropIfExists('tblrequest_summary');
         Schema::dropIfExists('tbluom');

@@ -49,10 +49,6 @@ const data = {
                     url: "/inventory/stock-in",
                 },
                 {
-                    title: "RIS",
-                    url: "/inventory/ris",
-                },
-                {
                     title: "Requests",
                     url: "/inventory/requests",
                 },

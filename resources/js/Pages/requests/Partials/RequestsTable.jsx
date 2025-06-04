@@ -8,7 +8,13 @@ import {
     TableCell,
 } from "@/components/ui/table";
 
-const RequestsTable = ({ requests, selectedRequest, onSelectRequest }) => {
+const RequestsTable = ({
+    requests,
+    selectedRequest,
+    onSelectRequest,
+    month,
+    year,
+}) => {
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         return date.toLocaleDateString("en-US", {
@@ -18,6 +24,13 @@ const RequestsTable = ({ requests, selectedRequest, onSelectRequest }) => {
         });
     };
 
+    const filteredRequests = requests.filter((req) => {
+        const reqDate = new Date(req.requestdate);
+        const reqMonth = String(reqDate.getMonth() + 1).padStart(2, "0");
+        const reqYear = reqDate.getFullYear().toString();
+        return reqMonth === month && reqYear === year;
+    });
+
     return (
         <Table>
             <TableHeader>
@@ -26,7 +39,7 @@ const RequestsTable = ({ requests, selectedRequest, onSelectRequest }) => {
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {requests.map((request) => (
+                {filteredRequests.map((request) => (
                     <TableRow
                         key={request.requestsummaryid}
                         onClick={() => onSelectRequest(request)}
@@ -34,14 +47,12 @@ const RequestsTable = ({ requests, selectedRequest, onSelectRequest }) => {
                             cursor: "pointer",
                             backgroundColor:
                                 selectedRequest?.requestsummaryid ===
-                                    request.requestsummaryid
+                                request.requestsummaryid
                                     ? "#e0e0e0"
                                     : "transparent",
                         }}
                     >
                         <TableCell className="py-2 text-sm text-gray-700">
-
-
                             <div className="text-gray-600 text-sm">
                                 Requester:{" "}
                                 <span className="font-medium">
@@ -54,14 +65,15 @@ const RequestsTable = ({ requests, selectedRequest, onSelectRequest }) => {
                                 Requested on: {formatDate(request.requestdate)}
                             </div>
                             <div
-                                className={`font-semibold mb-1 ${request.xstatus === "Pending"
-                                    ? "text-yellow-600"
-                                    : request.xstatus === "Acknowledged"
+                                className={`font-semibold mb-1 ${
+                                    request.xstatus === "Pending"
+                                        ? "text-yellow-600"
+                                        : request.xstatus === "Acknowledged"
                                         ? "text-green-600"
                                         : request.xstatus === "Served"
-                                            ? "text-blue-600"
-                                            : "text-gray-700"
-                                    }`}
+                                        ? "text-blue-600"
+                                        : "text-gray-700"
+                                }`}
                             >
                                 {request.xstatus}
                             </div>

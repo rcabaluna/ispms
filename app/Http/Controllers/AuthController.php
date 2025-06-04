@@ -9,6 +9,7 @@ class AuthController extends Controller
 {
     public function index()
     {
+
         return inertia('login/page');
     }
 
@@ -20,7 +21,7 @@ class AuthController extends Controller
         ]);
 
         if (Auth::attempt($credentials)) {
-            return redirect()->intended('/inventory/items');
+            return redirect()->intended('/inventory/requests');
         }else {
             return back()->withErrors([
                 'invalid' => 'Invalid username or password.',
@@ -28,6 +29,16 @@ class AuthController extends Controller
         }
 
         
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login');
     }
 
 }
