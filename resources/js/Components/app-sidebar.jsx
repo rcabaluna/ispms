@@ -58,6 +58,22 @@ const data = {
                 },
             ],
         },
+        {
+            title: "Reports",
+            url: "#",
+            icon: BookOpen,
+            isActive: true,
+            items: [
+                {
+                    title: "RIS",
+                    url: "/reports/ris",
+                },
+                {
+                    title: "RSMI",
+                    url: "/reports/rsmi",
+                },
+            ],
+        },
     ],
 };
 

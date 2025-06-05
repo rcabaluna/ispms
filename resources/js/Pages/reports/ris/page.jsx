@@ -1,12 +1,8 @@
 import React, { useState } from "react";
 import MainLayout from "@/Layouts/MainLayout";
 import { Input } from "@/Components/ui/input";
-import { columns } from "./Partials/TableColumns";
-import { DataTable } from "./Partials/DataTable";
 import EmployeesTable from "./Partials/EmployeesTable";
 import { Button } from "@/Components/ui/button";
-import AddItems from "./Partials/Issuance/AddItems";
-
 import {
     Select,
     SelectContent,
@@ -15,6 +11,7 @@ import {
     SelectValue,
 } from "@/Components/ui/select";
 import { Toaster } from "@/Components/ui/toaster";
+import RISDetails from "./Partials/RISDetails";
 
 const RIS = ({ employees }) => {
     const currentDate = new Date();
@@ -22,35 +19,63 @@ const RIS = ({ employees }) => {
     const currentYear = currentDate.getFullYear().toString();
 
     const [search, setSearch] = useState("");
-    const [openDialog, setOpenDialog] = useState(false);
     const [selectedMonth, setSelectedMonth] = useState(currentMonth);
     const [selectedYear, setSelectedYear] = useState(currentYear);
     const [risData, setRisData] = useState([]);
-
-    // New state for selected employee
     const [selectedEmployee, setSelectedEmployee] = useState(null);
 
     const years = Array.from(
         { length: 10 },
         (_, i) => `${currentDate.getFullYear() - i}`
     );
-
     const getMonthName = (monthNumber) =>
         new Date(2000, monthNumber - 1).toLocaleString("default", {
             month: "long",
         });
 
-    const refreshRISData = () => {
-        if (!selectedEmployee) return;
+    const handlePrint = () => {
+        const printContents =
+            document.getElementById("ris-print-section").innerHTML;
+        const printWindow = window.open("", "_blank");
+        printWindow.document.write(`<html><head><title>Print RIS</title>`);
+        printWindow.document.write(
+            `<style>table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid black; padding: 4px; text-align: center; }</style>`
+        );
+        printWindow.document.write(
+            `</head><body>${printContents}</body></html>`
+        );
+        printWindow.document.close();
+        printWindow.focus();
+        printWindow.print();
+        printWindow.close();
+    };
 
-        fetch(
-            `/inventory/ris/data/${selectedEmployee.empNumber}?month=${selectedMonth}&year=${selectedYear}`
-        )
-            .then((res) => res.json())
-            .then((data) => setRisData(data))
-            .catch((err) => {
-                console.error("Failed to refresh RIS data:", err);
-            });
+    const handleExportToExcel = () => {
+        if (!risData.length) return alert("No data to export.");
+
+        const tableData = risData.map((row) => ({
+            "Stock No.": row.stockNo,
+            UOM: row.unit,
+            Description: row.itemName,
+            Quantity: row.quantity,
+            Available: row.available ? "Yes" : "No",
+            "Issue Qty": row.issueQty,
+        }));
+
+        const csvContent =
+            "data:text/csv;charset=utf-8," +
+            [
+                Object.keys(tableData[0]).join(","),
+                ...tableData.map((row) => Object.values(row).join(",")),
+            ].join("\n");
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "ris_data.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     };
 
     return (
@@ -128,24 +153,22 @@ const RIS = ({ employees }) => {
                                 </Select>
                             </div>
 
-                            <Button
-                                onClick={() => setOpenDialog(true)}
-                                disabled={!selectedEmployee} // disable if no employee selected
-                            >
-                                Issue Items
-                            </Button>
+                            <div className="flex gap-2">
+                                <Button
+                                    onClick={handleExportToExcel}
+                                    variant="outline"
+                                >
+                                    Export to Excel
+                                </Button>
+                                <Button onClick={handlePrint} variant="default">
+                                    Print
+                                </Button>
+                            </div>
                         </div>
 
-                        <AddItems
-                            openDialog={openDialog}
-                            handleClose={setOpenDialog}
-                            employee={selectedEmployee}
-                            month={selectedMonth}
-                            year={selectedYear}
-                            refreshRISData={refreshRISData}
-                        />
-
-                        <DataTable columns={columns} data={risData} />
+                        <div id="ris-print-section">
+                            <RISDetails risData={risData} />
+                        </div>
                     </div>
                 </div>
             </div>

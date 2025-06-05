@@ -39,10 +39,8 @@
             });
 
             // RIS
-            Route::prefix('inventory/ris')->controller(RISController::class)->group(function () {
+            Route::prefix('reports/ris')->controller(RISController::class)->group(function () {
                 Route::get('/', 'index');
-                Route::post('/', 'store')->name('ris.store');
-                Route::get('/data/{empnumber}', 'employeee_ris')->name('ris.employee_ris');
             });
 
             // Stock In

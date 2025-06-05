@@ -10,7 +10,7 @@ class RISController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+     public function index()
     {
         // Raw SQL with join and where clause
         $employees = DB::connection('mysql2')->select("
@@ -21,28 +21,10 @@ class RISController extends Controller
         ");
 
         // Pass to Inertia view
-        return inertia('ris/page', [
+        return inertia('reports/ris/page', [
             'employees' => $employees,
         ]);
     }
-
-
-    public function employeee_ris(Request $request, string $empnumber){
-        $params = $request->all();
-
-        $items = DB::table('tblinventory_items as a')
-            ->join('tblris as b', 'b.stock_no', '=', 'a.stock_no')
-            ->where('b.empNumber', $empnumber)
-            ->where('b.year', $params['year'])
-            ->where('b.month', $params['month'])
-            ->groupBy('a.stock_no')
-            ->select('a.item', 'b.*')
-            ->get();
-
-        return response()->json($items);
-
-    }
-
 
     /**
      * Show the form for creating a new resource.
@@ -57,19 +39,7 @@ class RISController extends Controller
      */
     public function store(Request $request)
     {
-        $items = $request->input('items', []);
 
-        foreach ($items as $item) {
-            DB::table('tblris')->insert([
-                'empNumber' => $item['empNumber'],
-                'stock_no' => $item['stock_no'],
-                'quantity' => $item['quantity'],
-                'year' => $item['year'],
-                'month' => $item['month'],
-            ]);
-        }
-
-        return back()->with('message', 'Item/s issuance has been upload successfully!');
     }
 
     /**
