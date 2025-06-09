@@ -39,7 +39,23 @@ const RIS = ({ employees }) => {
         const printWindow = window.open("", "_blank");
         printWindow.document.write(`<html><head><title>Print RIS</title>`);
         printWindow.document.write(
-            `<style>table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid black; padding: 4px; text-align: center; }</style>`
+            `<style>
+            body { font-family: Arial, sans-serif; font-size: 18px; }
+            .text-l { text-align: left; }
+            .text-r { text-align: right; }
+            .brdr-l { border-left: 1px solid black; }
+            .brdr-r { border-right: 1px solid black; }
+            .brdr-t { border-top: 1px solid black; }
+            .brdr-b { border-bottom: 1px solid black; }
+            .brdr-n { border: none; }
+            .brdr-a { border: 1px solid black; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { padding-left: 2px; padding-right: 2px; text-align: center; }
+            .text-16{font-size: 16px !important;}
+            .text-12{font-size: 12px !important;}
+            .text-13{font-size: 13.33px !important;}
+
+            </style>`
         );
         printWindow.document.write(
             `</head><body>${printContents}</body></html>`
