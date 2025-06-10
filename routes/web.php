@@ -41,6 +41,8 @@
             // RIS
             Route::prefix('reports/ris')->controller(RISController::class)->group(function () {
                 Route::get('/', 'index');
+                // Route::get('/show/{empnumber}', 'show')->name('ris.show');
+
             });
 
             // Stock In
@@ -48,4 +50,9 @@
 
             // Logout
             Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
+
         });
+
+
+    Route::get('reports/ris/show/{empnumber}', [RISController::class,'show'])->name('ris.show');
+

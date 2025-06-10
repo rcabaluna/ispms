@@ -53,7 +53,19 @@ const RIS = ({ employees }) => {
             th, td { padding-left: 2px; padding-right: 2px; text-align: center; }
             .text-16{font-size: 16px !important;}
             .text-12{font-size: 12px !important;}
-            .text-13{font-size: 13.33px !important;}
+            .text-11{font-size: 11px !important;}
+            .text-13{font-size: 13.33px !important;
+            .width-100{width: 100% !important;}
+            .width-50{width: 50% !important;}
+            .width-25{width: 25% !important;}
+            .width-20{width: 20% !important;}
+            .width-15{width: 15% !important;}
+            .width-10{width: 10% !important;}
+            .width-8{width: 8% !important;}
+            .width-7{width: 7% !important;}
+            .width-6{width: 6% !important;}
+            .width-5{width: 5% !important;}
+            }
 
             </style>`
         );
@@ -183,7 +195,10 @@ const RIS = ({ employees }) => {
                         </div>
 
                         <div id="ris-print-section">
-                            <RISDetails risData={risData} />
+                            <RISDetails
+                                risData={risData}
+                                selectedEmployee={selectedEmployee}
+                            />
                         </div>
                     </div>
                 </div>

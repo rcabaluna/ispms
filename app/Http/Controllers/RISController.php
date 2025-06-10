@@ -25,52 +25,28 @@ class RISController extends Controller
             'employees' => $employees,
         ]);
     }
+    public function show(Request $request, string $empNumber)
+    {   
+        $param = $request->all();
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        $results = DB::table('tblrequest_details as a')
+        ->select([
+            DB::raw('COALESCE(SUM(a.quantity), 0) AS quantity'),
+            'a.stock_no',
+            'c.item',
+            'a.is_served',
+        ])
+        ->join('tblrequest_summary as b', 'b.requestsummaryid', '=', 'a.requestsummaryid')
+        ->join('tblinventory_items as c', 'c.stock_no', '=', 'a.stock_no')
+        ->where('b.supervisor', $empNumber)
+        ->where('b.xstatus', "Served")
+        ->whereMonth('b.requestDate', $param['month'])
+        ->whereYear('b.requestDate', $param['year'])
+        ->groupBy('a.stock_no', 'c.item', 'a.is_served')
+        ->get();
+
+        return response()->json($results);
+
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
 }

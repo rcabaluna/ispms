@@ -23,31 +23,6 @@ const EmployeesTable = ({
         const controller = new AbortController();
         const { empNumber } = selectedEmployee;
 
-        const fetchEmployeeRIS = async () => {
-            try {
-                const response = await fetch(
-                    `/inventory/ris/data/${empNumber}?month=${month}&year=${year}`,
-                    { signal: controller.signal }
-                );
-
-                if (!response.ok) {
-                    throw new Error(
-                        `Error ${response.status}: ${response.statusText}`
-                    );
-                }
-
-                const data = await response.json();
-                onRISFetched(data);
-            } catch (err) {
-                if (err.name !== "AbortError") {
-                    console.error("Fetch error:", err);
-                    onRISFetched([]);
-                }
-            }
-        };
-
-        fetchEmployeeRIS();
-
         return () => controller.abort();
     }, [selectedEmployee, month, year]);
 
