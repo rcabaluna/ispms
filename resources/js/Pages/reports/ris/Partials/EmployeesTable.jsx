@@ -27,9 +27,8 @@ const EmployeesTable = ({
     }, [selectedEmployee, month, year]);
 
     const filteredEmployees = employees.filter((employee) =>
-        `${employee.firstname} ${employee.surname} ${
-            employee.nameExtension || ""
-        } ${employee.positionDesc || ""}`
+        `${employee.firstname} ${employee.surname} ${employee.nameExtension || ""
+            } ${employee.positionDesc || ""}`
             .toLowerCase()
             .includes(search.toLowerCase())
     );
@@ -50,7 +49,7 @@ const EmployeesTable = ({
                             cursor: "pointer",
                             backgroundColor:
                                 selectedEmployee?.empNumber ===
-                                employee.empNumber
+                                    employee.empNumber
                                     ? "#e0e0e0"
                                     : "transparent",
                         }}

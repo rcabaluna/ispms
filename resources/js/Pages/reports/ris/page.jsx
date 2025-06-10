@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+// RIS.jsx
+import React, { useState, useEffect } from "react";
 import MainLayout from "@/Layouts/MainLayout";
 import { Input } from "@/Components/ui/input";
 import EmployeesTable from "./Partials/EmployeesTable";
@@ -40,32 +41,32 @@ const RIS = ({ employees }) => {
         printWindow.document.write(`<html><head><title>Print RIS</title>`);
         printWindow.document.write(
             `<style>
-            body { font-family: Arial, sans-serif; font-size: 18px; }
-            .text-l { text-align: left; }
-            .text-r { text-align: right; }
-            .brdr-l { border-left: 1px solid black; }
-            .brdr-r { border-right: 1px solid black; }
-            .brdr-t { border-top: 1px solid black; }
-            .brdr-b { border-bottom: 1px solid black; }
-            .brdr-n { border: none; }
-            .brdr-a { border: 1px solid black; }
-            table { width: 100%; border-collapse: collapse; }
-            th, td { padding-left: 2px; padding-right: 2px; text-align: center; }
-            .text-16{font-size: 16px !important;}
-            .text-12{font-size: 12px !important;}
-            .text-11{font-size: 11px !important;}
-            .text-13{font-size: 13.33px !important;
-            .width-100{width: 100% !important;}
-            .width-50{width: 50% !important;}
-            .width-25{width: 25% !important;}
-            .width-20{width: 20% !important;}
-            .width-15{width: 15% !important;}
-            .width-10{width: 10% !important;}
-            .width-8{width: 8% !important;}
-            .width-7{width: 7% !important;}
-            .width-6{width: 6% !important;}
-            .width-5{width: 5% !important;}
-            }
+                body { font-family: Arial, sans-serif; font-size: 18px; }
+                .text-l { text-align: left; }
+                .text-r { text-align: right; }
+                .brdr-l { border-left: 1px solid black; }
+                .brdr-r { border-right: 1px solid black; }
+                .brdr-t { border-top: 1px solid black; }
+                .brdr-b { border-bottom: 1px solid black; }
+                .brdr-n { border: none; }
+                .brdr-a { border: 1px solid black; }
+                table { width: 100%; border-collapse: collapse; }
+                th, td { padding-left: 2px; padding-right: 2px; text-align: center; }
+                .text-16{font-size: 16px !important;}
+                .text-12{font-size: 12px !important;}
+                .text-11{font-size: 11px !important;}
+                .text-13{font-size: 13.33px !important;}
+                .width-100{width: 100% !important;}
+                .width-50{width: 50% !important;}
+                .width-25{width: 25% !important;}
+                .width-20{width: 20% !important;}
+                .width-15{width: 15% !important;}
+                .width-10{width: 10% !important;}
+                .width-8{width: 8% !important;}
+                .width-7{width: 7% !important;}
+                .width-6{width: 6% !important;}
+                .width-5{width: 5% !important;}
+                }
 
             </style>`
         );
@@ -81,21 +82,28 @@ const RIS = ({ employees }) => {
     const handleExportToExcel = () => {
         if (!risData.length) return alert("No data to export.");
 
-        const tableData = risData.map((row) => ({
-            "Stock No.": row.stockNo,
-            UOM: row.unit,
-            Description: row.itemName,
-            Quantity: row.quantity,
-            Available: row.available ? "Yes" : "No",
-            "Issue Qty": row.issueQty,
-        }));
+        // Extract headers and data from RISDetails component
+        const table = document.querySelector("#ris-print-section table");
+        if (!table) {
+            alert("Table not found in RIS Details.");
+            return;
+        }
 
+        const headers = Array.from(table.querySelectorAll("th")).map(
+            (th) => th.textContent.trim()
+        );
+        const rows = Array.from(table.querySelectorAll("tbody tr")).map((row) =>
+            Array.from(row.querySelectorAll("td")).map((td) =>
+                td.textContent.trim()
+            )
+        );
+
+        // Prepare CSV content
         const csvContent =
             "data:text/csv;charset=utf-8," +
-            [
-                Object.keys(tableData[0]).join(","),
-                ...tableData.map((row) => Object.values(row).join(",")),
-            ].join("\n");
+            [headers.join(","), ...rows.map((row) => row.join(","))].join(
+                "\n"
+            );
 
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
@@ -105,6 +113,33 @@ const RIS = ({ employees }) => {
         link.click();
         document.body.removeChild(link);
     };
+
+    // Function to fetch RIS data based on selected employee, month, and year
+    const fetchRISData = async () => {
+        if (!selectedEmployee) {
+            setRisData([]);
+            return;
+        }
+
+        try {
+            const response = await fetch(
+                `/reports/ris/show/${selectedEmployee.empNumber}?month=${selectedMonth}&year=${selectedYear}`
+            );
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            const data = await response.json();
+            setRisData(data);
+        } catch (error) {
+            console.error("Error fetching RIS data:", error);
+            setRisData([]); // Ensure risData is empty in case of an error
+        }
+    };
+
+    // useEffect to trigger data fetching when selectedEmployee, month, or year changes
+    useEffect(() => {
+        fetchRISData();
+    }, [selectedEmployee, selectedMonth, selectedYear]);
 
     return (
         <>
@@ -198,6 +233,8 @@ const RIS = ({ employees }) => {
                             <RISDetails
                                 risData={risData}
                                 selectedEmployee={selectedEmployee}
+                                selectedMonth={selectedMonth}
+                                selectedYear={selectedYear}
                             />
                         </div>
                     </div>

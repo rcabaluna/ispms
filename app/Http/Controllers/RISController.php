@@ -14,7 +14,7 @@ class RISController extends Controller
     {
         // Raw SQL with join and where clause
         $employees = DB::connection('mysql2')->select("
-        SELECT a.empNumber, a.surname, a.firstname, a.nameExtension, a.middlename, c.positionDesc
+        SELECT a.empNumber, a.surname, a.firstname, a.nameExtension, a.middlename, c.positionDesc, c.positionAbb
         FROM tblemppersonal a JOIN tblempposition b ON b.empNumber = a.empNumber
         JOIN tblposition c ON c.positionCode = b.positionCode
         WHERE b.appointmentCode = 'P'

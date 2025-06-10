@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-const RISDetails = ({ risData, selectedEmployee }) => {
+const RISDetails = ({ risData, selectedEmployee, selectedMonth, selectedYear }) => {
     const [RISData, setRISData] = useState([]);
 
     // Example fallback data
@@ -20,14 +20,14 @@ const RISDetails = ({ risData, selectedEmployee }) => {
         try {
             const response = await fetch(
                 "/reports/ris/show/" +
-                    selectedEmployee.empNumber +
-                    "?month=06&year=2025"
+                selectedEmployee.empNumber +
+                "?month=06&year=2025"
             );
 
             console.log(
                 "/reports/ris/show/" +
-                    selectedEmployee.empNumber +
-                    "?month=06&year=2025"
+                selectedEmployee.empNumber +
+                "?month=" + selectedMonth + "&year=" + selectedYear
             );
             if (!response.ok) throw new Error("Network response was not ok");
             const data = await response.json();
@@ -38,9 +38,10 @@ const RISDetails = ({ risData, selectedEmployee }) => {
         }
     };
 
+
     useEffect(() => {
         getData();
-    }, [selectedEmployee]);
+    }, [selectedEmployee, selectedMonth, selectedYear]);
 
     if (!selectedEmployee)
         return (
@@ -118,8 +119,13 @@ const RISDetails = ({ risData, selectedEmployee }) => {
                         >
                             Responsibility Center Code:
                         </td>
-                        <td className="p-1 brdr-r" colSpan={2}>
-                            {selectedEmployee.empNumber}
+                        <td
+                            className=" text-13 border border-black p-1 text-left text-l brdr-r"
+                            colSpan={3}
+                        >
+                            {selectedEmployee.empNumber && selectedEmployee.empNumber.length > 4
+                                ? selectedEmployee.empNumber.slice(0, -4)
+                                : selectedEmployee.empNumber || ""}
                         </td>
                     </tr>
                     <tr className="border-t border-b border-black">
@@ -304,7 +310,12 @@ const RISDetails = ({ risData, selectedEmployee }) => {
                             className="border border-black px-2 text-semibold brdr-r text-13"
                             colSpan={2}
                         >
-                            <b>JOHN PAUL T. BALISTOY</b>
+                            <b>
+                                {selectedEmployee.firstname}
+                                {selectedEmployee.middlename ? ` ${selectedEmployee.middlename}` : ""}
+                                {selectedEmployee.surname ? ` ${selectedEmployee.surname}` : ""}
+                                {selectedEmployee.nameExtension ? ` ${selectedEmployee.nameExtension}` : ""}
+                            </b>
                         </td>
                         <td
                             className="border border-black px-2 text-semibold brdr-r text-13"
@@ -330,7 +341,7 @@ const RISDetails = ({ risData, selectedEmployee }) => {
                             className="border border-black p-1 brdr-a"
                             colSpan={2}
                         >
-                            Accountant III
+                            {selectedEmployee.positionAbb || ""}
                         </td>
                         <td
                             className="border border-black p-1 brdr-a"
@@ -342,7 +353,7 @@ const RISDetails = ({ risData, selectedEmployee }) => {
                             className="border border-black p-1 brdr-a"
                             colSpan={3}
                         >
-                            Accountant III
+                            {selectedEmployee.positionAbb || ""}
                         </td>
                     </tr>
                     <tr className="text-center brdr-a">
