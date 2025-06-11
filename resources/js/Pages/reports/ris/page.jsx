@@ -1,5 +1,4 @@
-// RIS.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import MainLayout from "@/Layouts/MainLayout";
 import { Input } from "@/Components/ui/input";
 import EmployeesTable from "./Partials/EmployeesTable";
@@ -22,13 +21,14 @@ const RIS = ({ employees }) => {
     const [search, setSearch] = useState("");
     const [selectedMonth, setSelectedMonth] = useState(currentMonth);
     const [selectedYear, setSelectedYear] = useState(currentYear);
-    const [risData, setRisData] = useState([]);
     const [selectedEmployee, setSelectedEmployee] = useState(null);
+    const [RISData, setRISData] = useState([]);
 
     const years = Array.from(
         { length: 10 },
         (_, i) => `${currentDate.getFullYear() - i}`
     );
+
     const getMonthName = (monthNumber) =>
         new Date(2000, monthNumber - 1).toLocaleString("default", {
             month: "long",
@@ -66,8 +66,7 @@ const RIS = ({ employees }) => {
                 .width-7{width: 7% !important;}
                 .width-6{width: 6% !important;}
                 .width-5{width: 5% !important;}
-                }
-
+                .p-2{padding: 2% !important;}
             </style>`
         );
         printWindow.document.write(
@@ -78,68 +77,6 @@ const RIS = ({ employees }) => {
         printWindow.print();
         printWindow.close();
     };
-
-    const handleExportToExcel = () => {
-        if (!risData.length) return alert("No data to export.");
-
-        // Extract headers and data from RISDetails component
-        const table = document.querySelector("#ris-print-section table");
-        if (!table) {
-            alert("Table not found in RIS Details.");
-            return;
-        }
-
-        const headers = Array.from(table.querySelectorAll("th")).map(
-            (th) => th.textContent.trim()
-        );
-        const rows = Array.from(table.querySelectorAll("tbody tr")).map((row) =>
-            Array.from(row.querySelectorAll("td")).map((td) =>
-                td.textContent.trim()
-            )
-        );
-
-        // Prepare CSV content
-        const csvContent =
-            "data:text/csv;charset=utf-8," +
-            [headers.join(","), ...rows.map((row) => row.join(","))].join(
-                "\n"
-            );
-
-        const encodedUri = encodeURI(csvContent);
-        const link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "ris_data.csv");
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    };
-
-    // Function to fetch RIS data based on selected employee, month, and year
-    const fetchRISData = async () => {
-        if (!selectedEmployee) {
-            setRisData([]);
-            return;
-        }
-
-        try {
-            const response = await fetch(
-                `/reports/ris/show/${selectedEmployee.empNumber}?month=${selectedMonth}&year=${selectedYear}`
-            );
-            if (!response.ok) {
-                throw new Error("Network response was not ok");
-            }
-            const data = await response.json();
-            setRisData(data);
-        } catch (error) {
-            console.error("Error fetching RIS data:", error);
-            setRisData([]); // Ensure risData is empty in case of an error
-        }
-    };
-
-    // useEffect to trigger data fetching when selectedEmployee, month, or year changes
-    useEffect(() => {
-        fetchRISData();
-    }, [selectedEmployee, selectedMonth, selectedYear]);
 
     return (
         <>
@@ -163,7 +100,6 @@ const RIS = ({ employees }) => {
                                 search={search}
                                 month={selectedMonth}
                                 year={selectedYear}
-                                onRISFetched={(data) => setRisData(data || [])}
                                 selectedEmployee={selectedEmployee}
                                 setSelectedEmployee={setSelectedEmployee}
                             />
@@ -217,24 +153,24 @@ const RIS = ({ employees }) => {
                             </div>
 
                             <div className="flex gap-2">
-                                <Button
-                                    onClick={handleExportToExcel}
-                                    variant="outline"
-                                >
-                                    Export to Excel
-                                </Button>
-                                <Button onClick={handlePrint} variant="default">
-                                    Print
-                                </Button>
+                                {selectedEmployee && RISData.length > 0 && (
+                                    <Button
+                                        onClick={handlePrint}
+                                        variant="default"
+                                    >
+                                        Print
+                                    </Button>
+                                )}
                             </div>
                         </div>
 
                         <div id="ris-print-section">
                             <RISDetails
-                                risData={risData}
                                 selectedEmployee={selectedEmployee}
                                 selectedMonth={selectedMonth}
                                 selectedYear={selectedYear}
+                                RISData={RISData}
+                                setRISDatax={setRISData}
                             />
                         </div>
                     </div>

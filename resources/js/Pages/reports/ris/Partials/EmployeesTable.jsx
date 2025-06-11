@@ -21,17 +21,22 @@ const EmployeesTable = ({
         if (!selectedEmployee) return;
 
         const controller = new AbortController();
-        const { empNumber } = selectedEmployee;
 
         return () => controller.abort();
     }, [selectedEmployee, month, year]);
 
-    const filteredEmployees = employees.filter((employee) =>
-        `${employee.firstname} ${employee.surname} ${employee.nameExtension || ""
-            } ${employee.positionDesc || ""}`
-            .toLowerCase()
-            .includes(search.toLowerCase())
-    );
+    const filteredEmployees = employees.filter((employee) => {
+        const fullName = [
+            employee.surname || "",
+            ", ",
+            employee.firstname || "",
+            employee.nameExtension ? ` ${employee.nameExtension}` : "",
+            employee.middlename ? ` ${employee.middlename.charAt(0)}.` : "",
+        ]
+            .join("")
+            .toLowerCase();
+        return fullName.includes(search.toLowerCase());
+    });
 
     return (
         <Table>
@@ -49,14 +54,23 @@ const EmployeesTable = ({
                             cursor: "pointer",
                             backgroundColor:
                                 selectedEmployee?.empNumber ===
-                                    employee.empNumber
+                                employee.empNumber
                                     ? "#e0e0e0"
                                     : "transparent",
                         }}
                     >
                         <TableCell>
-                            {employee.firstname} {employee.surname}{" "}
-                            {employee.nameExtension}
+                            {[
+                                employee.surname || "",
+                                ", ",
+                                employee.firstname || "",
+                                employee.nameExtension
+                                    ? ` ${employee.nameExtension}`
+                                    : "",
+                                employee.middlename
+                                    ? ` ${employee.middlename.charAt(0)}.`
+                                    : "",
+                            ].join("")}
                             <br />
                             <small>{employee.positionDesc}</small>
                         </TableCell>

@@ -1,46 +1,41 @@
 import React, { useEffect, useState } from "react";
 
-const RISDetails = ({ risData, selectedEmployee, selectedMonth, selectedYear }) => {
+const RISDetails = ({
+    selectedEmployee,
+    selectedMonth,
+    selectedYear,
+    setRISDatax,
+}) => {
     const [RISData, setRISData] = useState([]);
+    const [loading, setLoading] = useState(false);
 
-    // Example fallback data
-    const exampleData = [
-        {
-            stockNo: null,
-            unit: null,
-            itemName: null,
-            quantity: null,
-            available: null,
-            issueQty: null,
-        },
-    ];
-
-    // Fetch data from API
     const getData = async () => {
+        setLoading(true);
         try {
             const response = await fetch(
                 "/reports/ris/show/" +
-                selectedEmployee.empNumber +
-                "?month=06&year=2025"
+                    selectedEmployee.empNumber +
+                    "?month=" +
+                    selectedMonth +
+                    "&year=" +
+                    selectedYear
             );
 
-            console.log(
-                "/reports/ris/show/" +
-                selectedEmployee.empNumber +
-                "?month=" + selectedMonth + "&year=" + selectedYear
-            );
             if (!response.ok) throw new Error("Network response was not ok");
             const data = await response.json();
-
             setRISData(data);
+            setRISDatax(data);
         } catch (error) {
             console.error("Error fetching RIS data:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
-
     useEffect(() => {
-        getData();
+        if (selectedEmployee) {
+            getData();
+        }
     }, [selectedEmployee, selectedMonth, selectedYear]);
 
     if (!selectedEmployee)
@@ -50,10 +45,46 @@ const RISDetails = ({ risData, selectedEmployee, selectedMonth, selectedYear }) 
             </div>
         );
 
+    if (loading) {
+        return (
+            <div className="p-4 text-center text-gray-600">
+                <svg
+                    className="animate-spin h-8 w-8 mx-auto text-blue-500"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                >
+                    <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                    ></circle>
+                    <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                    ></path>
+                </svg>
+                <div className="mt-2 text-sm">Loading RIS data...</div>
+            </div>
+        );
+    }
+
     if (!RISData || RISData.length === 0)
         return (
             <div className="p-4 text-center text-red-600">
-                No RIS data available for the selected employee.
+                No RIS data available for {selectedEmployee.firstname}
+                {selectedEmployee.middlename
+                    ? ` ${selectedEmployee.middlename.charAt(0)}.`
+                    : ""}
+                {selectedEmployee.surname ? ` ${selectedEmployee.surname}` : ""}
+                {selectedEmployee.nameExtension
+                    ? ` ${selectedEmployee.nameExtension}`
+                    : ""}{" "}
+                for the month of {selectedMonth} {selectedYear}.
             </div>
         );
 
@@ -94,7 +125,7 @@ const RISDetails = ({ risData, selectedEmployee, selectedMonth, selectedYear }) 
                             <u>General Fund</u>
                         </td>
                     </tr>
-                    <tr className="border-t border-black brdr-l brdr-r">
+                    <tr className=" border-black brdr-l brdr-r">
                         <td className="p-1 font-semibold" colSpan={1}></td>
                         <td
                             className="p-1 font-semibold text-left text-l"
@@ -111,7 +142,7 @@ const RISDetails = ({ risData, selectedEmployee, selectedMonth, selectedYear }) 
                             className="p-1 border-r border-black brdr-r text-l"
                             colSpan={4}
                         >
-                            Admin Division
+                            {selectedEmployee.division || ""}
                         </td>
                         <td
                             className="p-1 font-semibold text-12 text-l text-13"
@@ -120,15 +151,16 @@ const RISDetails = ({ risData, selectedEmployee, selectedMonth, selectedYear }) 
                             Responsibility Center Code:
                         </td>
                         <td
-                            className=" text-13 border border-black p-1 text-left text-l brdr-r"
+                            className="text-13 p-1 text-left text-l brdr-r"
                             colSpan={3}
                         >
-                            {selectedEmployee.empNumber && selectedEmployee.empNumber.length > 4
+                            {selectedEmployee.empNumber &&
+                            selectedEmployee.empNumber.length > 4
                                 ? selectedEmployee.empNumber.slice(0, -4)
                                 : selectedEmployee.empNumber || ""}
                         </td>
                     </tr>
-                    <tr className="border-t border-b border-black">
+                    <tr className="border-b border-black">
                         <td
                             className="p-1 font-semibold text-l brdr-l"
                             colSpan={1}
@@ -136,16 +168,16 @@ const RISDetails = ({ risData, selectedEmployee, selectedMonth, selectedYear }) 
                             Office:
                         </td>
                         <td
-                            className="p-1  border-r border-black brdr-r text-l"
+                            className="p-1 border-r border-black brdr-r text-l"
                             colSpan={4}
                         >
-                            FASD
+                            {selectedEmployee.office || ""}
                         </td>
                         <td className="p-1 font-semibold text-l" colSpan={1}>
                             RIS No.:
                         </td>
                         <td className="p-1 brdr-r text-l" colSpan={4}>
-                            2025-03-001
+                            {selectedEmployee.ris_no || ""}
                         </td>
                     </tr>
 
@@ -204,38 +236,64 @@ const RISDetails = ({ risData, selectedEmployee, selectedMonth, selectedYear }) 
                             Remarks
                         </th>
                     </tr>
+                    <tr>
+                        <td className="text-13 p-1 text-l brdr-l brdr-r p-2"></td>
+                        <td className="text-13 border-l border-r border-black p-1 brdr-r p-2"></td>
+                        <td
+                            className="text-13 border-black p-1 text-left text-l brdr-r p-2"
+                            colSpan={3}
+                        ></td>
+                        <td className="text-13 border-l border-r border-black p-1 brdr-r p-2"></td>
+                        <td className="text-13 border-l border-r border-black p-1 brdr-r p-2"></td>
+                        <td className="text-13 border-black p-1 brdr-r"></td>
+                        <td className="text-13 border-l border-r border-black p-1 brdr-r p-2"></td>
+                        <td className="text-13 border-l border-r border-black p-1 brdr-r p-2"></td>
+                    </tr>
                     {RISData.map((item, idx) => (
                         <tr
                             key={idx}
                             className="text-center align-top items-list"
                         >
-                            <td className="text-13 border border-black p-1 text-l brdr-l brdr-r">
+                            <td className="text-13 p-1 text-l brdr-l brdr-r">
                                 {item.stock_no || ""}
                             </td>
-                            <td className=" text-13 border border-black p-1 brdr-r">
+                            <td className="text-13 border-l border-r border-black p-1 brdr-r">
                                 {item.unit || ""}
                             </td>
                             <td
-                                className=" text-13 border border-black p-1 text-left text-l brdr-r"
+                                className="text-13 border-black p-1 text-left text-l brdr-r"
                                 colSpan={3}
                             >
                                 {item.item}
                             </td>
-                            <td className=" text-13 border border-black p-1 brdr-r">
+                            <td className="text-13 border-l border-r border-black p-1 brdr-r">
                                 {item.quantity}
                             </td>
-                            <td className=" text-13 border border-black p-1 brdr-r">
+                            <td className="text-13 border-l border-r border-black p-1 brdr-r">
                                 {item.is_served ? "x" : ""}
                             </td>
-                            <td className=" text-13 border border-black p-1 brdr-r">
+                            <td className="text-13 border-black p-1 brdr-r">
                                 {!item.is_served ? "x" : ""}
                             </td>
-                            <td className=" text-13 border border-black p-1 brdr-r">
+                            <td className="text-13 border-l border-r border-black p-1 brdr-r">
                                 {item.issueQty}
                             </td>
-                            <td className=" text-13 border border-black p-1 brdr-r"></td>
+                            <td className="text-13 border-l border-r border-black p-1 brdr-r"></td>
                         </tr>
                     ))}
+                    <tr>
+                        <td className="text-13 p-1 text-l brdr-l brdr-r p-2"></td>
+                        <td className="text-13 border-l border-r border-black p-1 brdr-r p-2"></td>
+                        <td
+                            className="text-13 border-black p-1 text-left text-l brdr-r p-2"
+                            colSpan={3}
+                        ></td>
+                        <td className="text-13 border-l border-r border-black p-1 brdr-r p-2"></td>
+                        <td className="text-13 border-l border-r border-black p-1 brdr-r p-2"></td>
+                        <td className="text-13 border-black p-1 brdr-r"></td>
+                        <td className="text-13 border-l border-r border-black p-1 brdr-r p-2"></td>
+                        <td className="text-13 border-l border-r border-black p-1 brdr-r p-2"></td>
+                    </tr>
                     <tr className="brdr-a">
                         <td
                             className="border border-black p-1 font-semibold brdr-a text-r"
@@ -304,17 +362,25 @@ const RISDetails = ({ risData, selectedEmployee, selectedMonth, selectedYear }) 
                             colSpan={2}
                             className="border border-black px-2 text-left brdr-r text-left text-l"
                         >
-                            Printed Name:
+                            PRINTED NAME:
                         </td>
                         <td
                             className="border border-black px-2 text-semibold brdr-r text-13"
                             colSpan={2}
                         >
                             <b>
-                                {selectedEmployee.firstname}
-                                {selectedEmployee.middlename ? ` ${selectedEmployee.middlename}` : ""}
-                                {selectedEmployee.surname ? ` ${selectedEmployee.surname}` : ""}
-                                {selectedEmployee.nameExtension ? ` ${selectedEmployee.nameExtension}` : ""}
+                                {selectedEmployee.firstname?.toUpperCase()}
+                                {selectedEmployee.middlename
+                                    ? ` ${selectedEmployee.middlename
+                                          .charAt(0)
+                                          .toUpperCase()}.`
+                                    : ""}
+                                {selectedEmployee.surname
+                                    ? ` ${selectedEmployee.surname.toUpperCase()}`
+                                    : ""}
+                                {selectedEmployee.nameExtension
+                                    ? ` ${selectedEmployee.nameExtension.toUpperCase()}`
+                                    : ""}
                             </b>
                         </td>
                         <td
@@ -327,7 +393,20 @@ const RISDetails = ({ risData, selectedEmployee, selectedMonth, selectedYear }) 
                             className="border border-black px-2 text-semibold text-13"
                             colSpan={3}
                         >
-                            <b>JOHN PAUL T. BALISTOY</b>
+                            <b>
+                                {selectedEmployee.firstname?.toUpperCase()}
+                                {selectedEmployee.middlename
+                                    ? ` ${selectedEmployee.middlename
+                                          .charAt(0)
+                                          .toUpperCase()}.`
+                                    : ""}
+                                {selectedEmployee.surname
+                                    ? ` ${selectedEmployee.surname.toUpperCase()}`
+                                    : ""}
+                                {selectedEmployee.nameExtension
+                                    ? ` ${selectedEmployee.nameExtension.toUpperCase()}`
+                                    : ""}
+                            </b>
                         </td>
                     </tr>
                     <tr className="text-center brdr-a">
