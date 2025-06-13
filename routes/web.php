@@ -7,6 +7,7 @@
     use App\Http\Controllers\AuthController;
     use App\Http\Controllers\InventoryRequestsController;
     use App\Http\Controllers\RISController;
+use App\Http\Controllers\RSMIController;
 
         // Public Routes
         Route::get('/', [RequestController::class, 'index']);
@@ -41,8 +42,11 @@
             // RIS
             Route::prefix('reports/ris')->controller(RISController::class)->group(function () {
                 Route::get('/', 'index');
-                // Route::get('/show/{empnumber}', 'show')->name('ris.show');
+                Route::get('/show/{empnumber}', 'show')->name('ris.show');
+            });
 
+            Route::prefix('reports/rsmi')->controller(RSMIController::class)->group(function () {
+                Route::get('/', 'index');
             });
 
             // Stock In
@@ -54,5 +58,5 @@
         });
 
 
-    Route::get('reports/ris/show/{empnumber}', [RISController::class,'show'])->name('ris.show');
+    
 
