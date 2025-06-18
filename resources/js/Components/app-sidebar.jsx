@@ -74,6 +74,18 @@ const data = {
                 },
             ],
         },
+        {
+            title: "Libraries",
+            url: "#",
+            icon: BookOpen,
+            isActive: true,
+            items: [
+                {
+                    title: "Emp RIS No",
+                    url: "/libraries/risno",
+                },
+            ],
+        },
     ],
 };
 

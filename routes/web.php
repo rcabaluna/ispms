@@ -6,8 +6,9 @@
     use App\Http\Controllers\StockinController;
     use App\Http\Controllers\AuthController;
     use App\Http\Controllers\InventoryRequestsController;
+    use App\Http\Controllers\Libraries\RISNoController;
     use App\Http\Controllers\RISController;
-use App\Http\Controllers\RSMIController;
+    use App\Http\Controllers\RSMIController;
 
         // Public Routes
         Route::get('/', [RequestController::class, 'index']);
@@ -54,6 +55,13 @@ use App\Http\Controllers\RSMIController;
 
             // Logout
             Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
+
+            Route::prefix('libraries/risno')->controller(RISNoController::class)->group(function () {
+                Route::get('/', 'index');
+                // Route::post('/store', 'store')->name('risno.store');
+                Route::put('/update/{empnumber}', 'update')->name('risno.update');
+                // Route::delete('/destroy/{id}', 'destroy')->name('risno.destroy');
+            });
 
         });
 
