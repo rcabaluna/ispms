@@ -177,7 +177,11 @@ const RISDetails = ({
                             RIS No.:
                         </td>
                         <td className="p-1 brdr-r text-l" colSpan={4}>
-                            {selectedEmployee.ris_no || ""}
+                            {selectedYear +
+                                "-" +
+                                selectedMonth +
+                                "-" +
+                                selectedEmployee.risno || ""}
                         </td>
                     </tr>
 

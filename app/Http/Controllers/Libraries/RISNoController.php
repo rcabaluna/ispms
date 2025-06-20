@@ -24,6 +24,7 @@ class RISNoController extends Controller
             ->where('b.appointmentCode', 'P')
             ->where('a.empNumber', '!=', '1111')
             ->select('a.empNumber', 'a.firstname', 'a.surname', 'a.middlename', 'a.nameExtension')
+            ->orderBy('a.surname','ASC')
             ->get());
 
         // Build new employee array with 'risno' attached
@@ -81,12 +82,18 @@ class RISNoController extends Controller
     public function update(Request $request, string $empnumber)
     {
         $data = $request->all();
-        // Validate the incoming request
-        $risno = RISNoModel::updateOrCreate(
-            ['empnumber' => $empnumber],
-            ['risno' => $data['risno']]
-        );
+
+        if ($data['risno'] == '' || $data['risno'] == null) {
+            RISNoModel::where('empnumber', $empnumber)->delete();
+        } else {
+            RISNoModel::updateOrCreate(
+                ['empnumber' => $empnumber],
+                ['risno' => $data['risno']]
+            );
+        }
+
     }
+
 
     /**
      * Remove the specified resource from storage.

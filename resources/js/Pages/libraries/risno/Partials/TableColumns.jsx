@@ -5,36 +5,21 @@ import { DataTableColumnHeader } from "@/components/table-functions/DataTableCol
 import { Input } from "@/Components/ui/input";
 import { useState } from "react";
 import { router } from "@inertiajs/react";
+import { useDebouncedCallback } from "use-debounce";
 
-const handleRisnoUpdate = (e, empnumber, risno) => {
-    e.preventDefault();
-    router.put(route("risno.update", { empnumber }), {
-        risno,
-    });
+const useRisnoUpdate = () => {
+    return useDebouncedCallback((empnumber, risno) => {
+        router.put(route("risno.update", { empnumber }), {
+            risno,
+        });
+    }, 500);
 };
 
 export const columns = [
     {
-        id: "select",
-        header: ({ table }) => (
-            <Checkbox
-                checked={
-                    table.getIsAllPageRowsSelected() ||
-                    (table.getIsSomePageRowsSelected() && "indeterminate")
-                }
-                onCheckedChange={(value) =>
-                    table.toggleAllPageRowsSelected(!!value)
-                }
-                aria-label="Select all"
-            />
-        ),
-        cell: ({ row }) => (
-            <Checkbox
-                checked={row.getIsSelected()}
-                onCheckedChange={(value) => row.toggleSelected(!!value)}
-                aria-label="Select row"
-            />
-        ),
+        id: "rowNumber",
+        header: "#",
+        cell: ({ row }) => row.index + 1, // display starts from 1
         enableSorting: false,
         enableHiding: false,
     },
@@ -64,11 +49,16 @@ export const columns = [
         ),
         cell: ({ row }) => {
             const [risno, setRisno] = useState(row.original.risno ?? "");
+            const debouncedUpdate = useRisnoUpdate();
 
             return (
                 <Input
                     value={risno}
-                    onChange={(e) => setRisno(e.target.value)}
+                    onChange={(e) => {
+                        const newRisno = e.target.value;
+                        setRisno(newRisno);
+                        debouncedUpdate(row.original.empNumber, newRisno);
+                    }}
                     className="h-7 px-1 py-0.5 text-xs w-20"
                 />
             );
