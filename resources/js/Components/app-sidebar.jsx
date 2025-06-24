@@ -23,7 +23,13 @@ import {
     SidebarRail,
 } from "@/components/ui/sidebar";
 
-// This is sample data.
+// Map titles to lucide icons
+const iconMap = {
+    Inventory: BookOpen,
+    Reports: PieChart,
+    Libraries: Settings2,
+};
+
 const data = {
     user: {
         name: "Supply Officer",
@@ -41,49 +47,32 @@ const data = {
         {
             title: "Inventory",
             url: "#",
-            icon: BookOpen,
+            icon: iconMap["Inventory"],
             isActive: true,
             items: [
-                {
-                    title: "Stock In",
-                    url: "/inventory/stock-in",
-                },
-                {
-                    title: "Requests",
-                    url: "/inventory/requests",
-                },
-                {
-                    title: "Items",
-                    url: "/inventory/items",
-                },
+                { title: "Stock In", url: "/inventory/stock-in" },
+                { title: "Requests", url: "/inventory/requests" },
+                { title: "Items", url: "/inventory/items" },
             ],
         },
         {
             title: "Reports",
             url: "#",
-            icon: BookOpen,
+            icon: iconMap["Reports"],
             isActive: true,
             items: [
-                {
-                    title: "RIS",
-                    url: "/reports/ris",
-                },
-                {
-                    title: "RSMI",
-                    url: "/reports/rsmi",
-                },
+                { title: "RIS", url: "/reports/ris" },
+                { title: "RSMI", url: "/reports/rsmi" },
             ],
         },
         {
             title: "Libraries",
             url: "#",
-            icon: BookOpen,
+            icon: iconMap["Libraries"],
             isActive: true,
             items: [
-                {
-                    title: "Emp RIS No",
-                    url: "/libraries/risno",
-                },
+                { title: "Unit of Measure", url: "/libraries/uom" },
+                { title: "Emp RIS No", url: "/libraries/risno" },
             ],
         },
     ],
@@ -92,13 +81,13 @@ const data = {
 export function AppSidebar({ ...props }) {
     return (
         <Sidebar collapsible="icon" {...props}>
-            <SidebarHeader className="bg-slate-200">
+            <SidebarHeader className="bg-primary text-primary-foreground">
                 <TeamSwitcher teams={data.teams} />
             </SidebarHeader>
-            <SidebarContent className="bg-slate-200">
+            <SidebarContent className="bg-primary text-primary-foreground">
                 <NavMain items={data.navMain} />
             </SidebarContent>
-            <SidebarFooter className="bg-slate-200">
+            <SidebarFooter className="bg-primary text-primary-foreground">
                 <NavUser user={data.user} />
             </SidebarFooter>
             <SidebarRail />

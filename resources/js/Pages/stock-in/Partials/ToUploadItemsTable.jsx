@@ -19,12 +19,13 @@ const ToUploadItemsTable = ({ excelData }) => {
             <Table className="table-fixed w-full">
                 <TableHeader className="bg-gray-100 sticky top-0 z-10">
                     <TableRow>
-                        <TableHead className="w-1/4">Stock No.</TableHead>
-                        <TableHead className="w-1/4 text-center">
+                        <TableHead className="w-1/6">Stock No.</TableHead>
+                        <TableHead className="w-1/12 text-center">
                             Quantity
                         </TableHead>
-                        <TableHead className="w-1/4">Item</TableHead>
-                        <TableHead className="w-1/4 text-right">
+                        <TableHead className="w-1/2">Item</TableHead>
+                        <TableHead className="w-1/12">UOM</TableHead>
+                        <TableHead className="w-1/6 text-right">
                             Unit Cost
                         </TableHead>
                     </TableRow>
@@ -35,16 +36,19 @@ const ToUploadItemsTable = ({ excelData }) => {
                     <TableBody>
                         {excelData.map((row, index) => (
                             <TableRow key={index}>
-                                <TableCell className="w-1/4">
+                                <TableCell className="w-1/6">
                                     {row.stock_no}
                                 </TableCell>
-                                <TableCell className="w-1/4 text-center">
+                                <TableCell className="w-1/12 text-center">
                                     {row.quantity}
                                 </TableCell>
-                                <TableCell className="w-1/4">
+                                <TableCell className="w-1/2">
                                     {row.item}
                                 </TableCell>
-                                <TableCell className="w-1/4 text-right">
+                                <TableCell className="w-1/12">
+                                    {row.uom}
+                                </TableCell>
+                                <TableCell className="w-1/6 text-right">
                                     {row.unit_cost}
                                 </TableCell>
                             </TableRow>

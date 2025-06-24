@@ -11,6 +11,7 @@ class InventoryItemsModel extends Model
         'invitemsid',
         'stock_no',
         'item',
+        'uomid',
         'quantity',
         'unit_cost',
         'uacs_code',

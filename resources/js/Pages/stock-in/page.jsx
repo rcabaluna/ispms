@@ -27,6 +27,7 @@ const StockIn = ({ stockins }) => {
     const [PONumber, setPONumber] = useState("");
     const [file, setFile] = useState(null);
     const [dialogOpen, setDialogOpen] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
 
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0];
@@ -67,6 +68,9 @@ const StockIn = ({ stockins }) => {
             alert("Please fill in all fields.");
             return;
         }
+
+        setIsUploading(true); // start loading
+
         router.post(
             route("stock-in.store"),
             {
@@ -84,6 +88,7 @@ const StockIn = ({ stockins }) => {
                     setFile(null);
                     setExcelData([]);
                     setDialogOpen(false);
+                    setIsUploading(false); // stop loading
                 },
                 onError: (errors) => {
                     if (errors.ponumber) {
@@ -99,6 +104,7 @@ const StockIn = ({ stockins }) => {
                             className: "bg-red-500 text-white",
                         });
                     }
+                    setIsUploading(false); // stop loading
                 },
             }
         );
@@ -118,7 +124,7 @@ const StockIn = ({ stockins }) => {
                         <AlertDialogTrigger asChild>
                             <Button>New Stock-in</Button>
                         </AlertDialogTrigger>
-                        <AlertDialogContent className="w-full max-w-3xl">
+                        <AlertDialogContent className="w-full max-w-5xl">
                             <AlertDialogHeader>
                                 <AlertDialogTitle>
                                     Upload new items to stock-in
@@ -161,6 +167,14 @@ const StockIn = ({ stockins }) => {
                                         <ToUploadItemsTable
                                             excelData={excelData}
                                         />
+                                        <p className="text-sm italic text-gray-500">
+                                            Note: Item/s without a unit of
+                                            measure will default to{" "}
+                                            <span className="text-green-600 font-medium">
+                                                "piece"
+                                            </span>
+                                            .
+                                        </p>
                                     </div>
                                 </div>
 
@@ -168,7 +182,14 @@ const StockIn = ({ stockins }) => {
                                     <AlertDialogCancel type="button">
                                         Cancel
                                     </AlertDialogCancel>
-                                    <Button type="submit">Submit</Button>
+                                    <Button
+                                        type="submit"
+                                        disabled={isUploading}
+                                    >
+                                        {isUploading
+                                            ? "Uploading..."
+                                            : "Submit"}
+                                    </Button>
                                 </AlertDialogFooter>
                             </form>
                         </AlertDialogContent>

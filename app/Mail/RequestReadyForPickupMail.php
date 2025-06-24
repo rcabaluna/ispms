@@ -28,7 +28,7 @@ class RequestReadyForPickupMail extends Mailable
     public function envelope(): Envelope
 {
     return new Envelope(
-        subject: '[ISPMS] Supplies Request Update - Ready for Pickup',
+        subject: '[ISPMS] Supplies Request Update - Your Requested Items Are Ready',
     );
 }
 

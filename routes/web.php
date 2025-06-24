@@ -1,5 +1,6 @@
 <?php
 
+    use App\Http\Controllers\Libraries\UOMController;
     use Illuminate\Support\Facades\Route;
     use App\Http\Controllers\InventoryItemsController;
     use App\Http\Controllers\RequestController;
@@ -14,6 +15,7 @@
         Route::get('/', [RequestController::class, 'index']);
         Route::get('login', [AuthController::class, 'index'])->name('login');
         Route::post('login', [AuthController::class, 'login'])->name('auth.login');
+        Route::get('/logout', [AuthController::class, 'logout'])->name('auth.logout');
 
         Route::prefix('items/request')->group(function () {
             Route::get('/', [RequestController::class, 'index']);
@@ -50,18 +52,21 @@
                 Route::get('/', 'index');
             });
 
-            // Stock In
             Route::resource('inventory/stock-in', StockinController::class);
 
-            // Logout
-            Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
 
             Route::prefix('libraries/risno')->controller(RISNoController::class)->group(function () {
                 Route::get('/', 'index');
-                // Route::post('/store', 'store')->name('risno.store');
                 Route::put('/update/{empnumber}', 'update')->name('risno.update');
-                // Route::delete('/destroy/{id}', 'destroy')->name('risno.destroy');
             });
+
+            Route::prefix('libraries/uom')->controller(UOMController::class)->group(function () {
+                Route::get('/', 'index');
+                Route::post('/', 'store')->name('uom.store');
+                Route::put('/{uomid}', 'update')->name('uom.update');
+
+            });
+
 
         });
 

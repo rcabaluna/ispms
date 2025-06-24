@@ -1,5 +1,5 @@
 import MainLayout from "@/Layouts/MainLayout";
-import React, { useState } from "react";
+import React from "react";
 import { DataTable } from "./Partials/DataTable";
 import { columns } from "./Partials/TableColumns";
 import { Toaster } from "@/components/ui/toaster";

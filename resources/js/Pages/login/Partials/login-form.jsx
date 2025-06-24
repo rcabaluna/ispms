@@ -26,9 +26,6 @@ export function LoginForm({ className, ...props }) {
                 password,
             },
             {
-                // onSuccess: () => {
-                //     window.location.href = "inventory/items";
-                // },
                 onError: (errors) => {
                     if (errors.invalid) {
                         setErrorMessage(errors.invalid);
@@ -42,16 +39,20 @@ export function LoginForm({ className, ...props }) {
         <div className={cn("flex flex-col gap-6", className)} {...props}>
             <Card>
                 <CardHeader className="text-center">
-                    <CardTitle className="text-xl">ISPMS</CardTitle>
+                    <CardTitle className="text-center">Login</CardTitle>
                     <CardDescription>
-                        Integrated Supplies and Procurement Management System
+                        <span>Login to access the system.</span>{" "}
                         {errorMessage && (
-                            <div className="text-red-500 text-sm text-center">
+                            <div
+                                style={{ color: "hsl(var(--red))" }}
+                                className="text-sm text-center"
+                            >
                                 {errorMessage}
                             </div>
                         )}
                     </CardDescription>
                 </CardHeader>
+
                 <CardContent>
                     <form onSubmit={handleSubmit} className="grid gap-6">
                         <div className="grid gap-6">
@@ -84,8 +85,28 @@ export function LoginForm({ className, ...props }) {
                     </form>
                 </CardContent>
             </Card>
-            <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary">
-                2025. Developed by <a href="#">DOST 10</a> - MIS Unit.
+            <div
+                className="text-center text-xs"
+                style={{
+                    color: "#fff", // parent text white
+                }}
+            >
+                2025. Developed by{" "}
+                <a
+                    href="#"
+                    style={{
+                        color: "#fff", // default white color
+                        textDecoration: "underline",
+                        textUnderlineOffset: "4px",
+                    }}
+                    onMouseEnter={(e) =>
+                        (e.target.style.color = "hsl(var(--primary-hover))")
+                    }
+                    onMouseLeave={(e) => (e.target.style.color = "#fff")}
+                >
+                    DOST 10
+                </a>{" "}
+                - MIS Unit.
             </div>
         </div>
     );

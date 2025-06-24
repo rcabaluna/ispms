@@ -9,22 +9,41 @@ const Request = ({ employees, items }) => {
         <div className="flex flex-col flex-1 p-4 pt-0 min-h-screen">
             {/* Page Header */}
             <div className="px-6 py-4">
-                <h1 className="text-2xl font-bold text-sky-800">
+                <h1
+                    className="text-2xl font-bold"
+                    style={{ color: "hsl(var(--primary))" }} // Use primary color
+                >
                     Office Supplies Requisition Tool
                 </h1>
-                <p className="text-gray-600 mt-1 text-sm max-w-3xl">
+                <p
+                    className="mt-1 text-sm max-w-3xl"
+                    style={{ color: "hsl(var(--muted-foreground))" }} // muted text color
+                >
                     Use this module to request office supplies from the
                     inventory. Select items, specify quantities, and submit your
                     request.
                 </p>
             </div>
 
-            <hr className="border-t border-sky-200 my-2" />
+            <hr
+                className="my-2"
+                style={{
+                    borderTopWidth: "1px",
+                    borderColor: "hsl(var(--border))",
+                }}
+            />
 
             {/* Main Layout */}
             <div className="flex w-full flex-1">
                 {/* Sidebar */}
-                <div className="w-[25%] border-r border-border bg-white p-4 flex flex-col">
+                <div
+                    className="w-[25%] border-r p-4 flex flex-col"
+                    style={{
+                        backgroundColor: "hsl(var(--sidebar-background))",
+                        color: "hsl(var(--sidebar-foreground))",
+                        borderColor: "hsl(var(--sidebar-border))",
+                    }}
+                >
                     <div
                         className="overflow-y-auto relative"
                         style={{ maxHeight: "calc(100vh - 180px)" }}

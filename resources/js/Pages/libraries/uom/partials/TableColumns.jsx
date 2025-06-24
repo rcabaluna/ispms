@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { router } from "@inertiajs/react";
 import { MoreHorizontal } from "lucide-react";
-import { router, useForm } from "@inertiajs/react";
 
+import { DataTableColumnHeader } from "@/components/table-functions/DataTableColumnHeader";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -26,10 +27,6 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-import { Checkbox } from "@/components/ui/checkbox";
-import { DataTableColumnHeader } from "@/components/table-functions/DataTableColumnHeader";
-import { ShowToast } from "@/Layouts/ShowToast";
-
 import {
     Dialog,
     DialogContent,
@@ -39,80 +36,30 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
-import { Label } from "@/Components/ui/label";
-import { Input } from "@/Components/ui/input";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+import { ShowToast } from "@/Layouts/ShowToast";
 
 export const columns = [
     {
-        id: "select",
-        header: ({ table }) => (
-            <Checkbox
-                checked={
-                    table.getIsAllPageRowsSelected() ||
-                    (table.getIsSomePageRowsSelected() && "indeterminate")
-                }
-                onCheckedChange={(value) =>
-                    table.toggleAllPageRowsSelected(!!value)
-                }
-                aria-label="Select all"
-            />
-        ),
-        cell: ({ row }) => (
-            <Checkbox
-                checked={row.getIsSelected()}
-                onCheckedChange={(value) => row.toggleSelected(!!value)}
-                aria-label="Select row"
-            />
-        ),
+        id: "rowNumber",
+        header: "#",
+        cell: ({ row }) => row.index + 1,
         enableSorting: false,
         enableHiding: false,
     },
     {
-        accessorKey: "no",
+        accessorKey: "name",
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="No." />
-        ),
-        cell: ({ row }) => <div>{row.index + 1}</div>,
-    },
-    {
-        accessorKey: "stock_no",
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Stock Number" />
+            <DataTableColumnHeader column={column} title="OUM" />
         ),
     },
     {
-        accessorKey: "quantity",
+        accessorKey: "abbreviation",
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Quantity" />
+            <DataTableColumnHeader column={column} title="Shorthand" />
         ),
-        cell: ({ row }) => (
-            <div className="text-center">{row.getValue("quantity")}</div>
-        ),
-    },
-    {
-        accessorKey: "item",
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Item" />
-        ),
-    },
-    {
-        accessorKey: "uom_name",
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="UOM" />
-        ),
-    },
-    {
-        accessorKey: "unit_cost",
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Unit Cost" />
-        ),
-        cell: ({ row }) => {
-            const value = row.getValue("unit_cost");
-            const formattedValue = Number.isInteger(value)
-                ? `${value}.00`
-                : value;
-            return <div>{formattedValue}</div>;
-        },
     },
     {
         id: "actions",
@@ -120,77 +67,50 @@ export const columns = [
             <DataTableColumnHeader column={column} title="Actions" />
         ),
         cell: ({ row }) => {
-            const item = row.original;
-            const { delete: destroy } = useForm();
+            const uom = row.original;
             const [open, setOpen] = useState(false);
             const [editOpen, setEditOpen] = useState(false);
-            const [quantity, setQuantity] = useState(item.quantity);
-            const [unitCost, setUnitCost] = useState(item.unit_cost);
 
-            const ConfirmDelete = () => {
-                destroy(
-                    route("items.destroy", {
-                        invitemsid: item.invitemsid,
-                    }),
-                    {
-                        onSuccess: (response) => {
-                            ShowToast({
-                                title: "Success!",
-                                description: response.props.flash.message,
-                                className: "bg-green-500 text-white",
-                            });
-                            setOpen(false);
-                        },
-                        onError: (errors) => {
-                            ShowToast({
-                                title: "Request failed",
-                                description: errors.message,
-                                className: "bg-red-500 text-white",
-                            });
-                        },
-                        onFinish: () => {
-                            setOpen(false);
-                        },
-                    }
-                );
+            // Local state for form inputs
+            const [name, setName] = useState(uom.name || "");
+            const [abbreviation, setAbbreviation] = useState(
+                uom.abbreviation || ""
+            );
+
+            const confirmDelete = (e) => {
+                // Implement your delete logic here
             };
 
-            const handleEdit = (invitemsid) => {
+            const handleEdit = () => {
                 router.put(
-                    route("items.update", {
-                        invitemsid: invitemsid,
-                    }),
-                    {
-                        quantity: quantity,
-                        unit_cost: unitCost,
-                    },
+                    route("uom.update", { uomid: uom.uomid }),
+                    { name, abbreviation },
                     {
                         onSuccess: (response) => {
                             ShowToast({
                                 title: "Success!",
-                                description: response.props.flash.message,
+                                description: "UOM updated successfully!",
                                 className: "bg-green-500 text-white",
                             });
                             setEditOpen(false);
                         },
                         onError: (errors) => {
-                            if (errors.ponumber) {
-                                ShowToast({
-                                    title: "Duplicate PO Number",
-                                    description: errors.ponumber,
-                                    className: "bg-red-500 text-white",
-                                });
-                            } else {
-                                ShowToast({
-                                    title: "Request failed",
-                                    description:
-                                        "An unexpected error occurred.",
-                                    className: "bg-red-500 text-white",
-                                });
-                            }
+                            console.log(errors);
+                            ShowToast({
+                                title: "Error!",
+                                description: errors.message,
+                                className: "bg-red-500 text-white",
+                            });
                         },
                     }
                 );
+            };
+
+            // Sync local state when dialog opens, so form inputs are up-to-date with current row
+            const openEditDialog = () => {
+                setName(uom.name || "");
+                setAbbreviation(uom.abbreviation || "");
+                setEditOpen(true);
             };
 
             return (
@@ -208,11 +128,13 @@ export const columns = [
                             <DropdownMenuItem
                                 onClick={() => {
                                     setOpen(false);
-                                    setEditOpen(true);
+                                    openEditDialog();
                                 }}
                             >
                                 Edit
                             </DropdownMenuItem>
+
+                            <DropdownMenuItem>View Items</DropdownMenuItem>
                             <AlertDialog>
                                 <AlertDialogTrigger asChild>
                                     <DropdownMenuItem
@@ -236,8 +158,8 @@ export const columns = [
                                             Cancel
                                         </AlertDialogCancel>
                                         <AlertDialogAction
+                                            onClick={confirmDelete}
                                             className="bg-red-500"
-                                            onClick={ConfirmDelete}
                                         >
                                             Confirm
                                         </AlertDialogAction>
@@ -250,49 +172,48 @@ export const columns = [
                     <Dialog open={editOpen} onOpenChange={setEditOpen}>
                         <DialogContent>
                             <DialogHeader>
-                                <DialogTitle>{item.item} </DialogTitle>
-                                <DialogDescription>
-                                    Edit the details of this item.
-                                </DialogDescription>
+                                <DialogTitle>Edit Unit of Measure</DialogTitle>
                             </DialogHeader>
+
                             <div className="grid gap-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="quantity">Quantity</Label>
+                                    <Label htmlFor="name">
+                                        Unit of Measure
+                                    </Label>
                                     <Input
-                                        id="quantity"
-                                        type="number"
-                                        defaultValue={item.quantity}
+                                        id="name"
+                                        value={name}
                                         onChange={(e) =>
-                                            setQuantity(e.target.value)
+                                            setName(e.target.value)
                                         }
+                                        placeholder="Enter UOM"
                                         required
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="unit_cost">Unit Cost</Label>
+                                    <Label htmlFor="abbreviation">
+                                        Shorthand
+                                    </Label>
                                     <Input
-                                        id="unit_cost"
-                                        type="number"
+                                        id="abbreviation"
+                                        value={abbreviation}
                                         onChange={(e) =>
-                                            setUnitCost(e.target.value)
+                                            setAbbreviation(e.target.value)
                                         }
-                                        defaultValue={item.unit_cost}
+                                        placeholder="Enter Shorthand"
                                         required
                                     />
                                 </div>
                             </div>
+
                             <DialogFooter>
                                 <Button
-                                    variant="outline"
+                                    variant="secondary"
                                     onClick={() => setEditOpen(false)}
                                 >
                                     Cancel
                                 </Button>
-                                <Button
-                                    onClick={() => handleEdit(item.invitemsid)}
-                                >
-                                    Update
-                                </Button>
+                                <Button onClick={handleEdit}>Update</Button>
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>

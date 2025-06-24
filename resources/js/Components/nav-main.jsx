@@ -21,30 +21,50 @@ import { Link } from "@inertiajs/react";
 
 export function NavMain({ items }) {
     return (
-        <SidebarGroup>
-            <SidebarGroupLabel>Platform</SidebarGroupLabel>
-            <SidebarMenu>
+        <SidebarGroup className="text-white">
+            <SidebarGroupLabel className="text-white">
+                Modules
+            </SidebarGroupLabel>
+            <SidebarMenu className="text-white">
                 {items.map((item) => (
                     <Collapsible
                         key={item.title}
                         asChild
                         defaultOpen={item.isActive}
-                        className="group/collapsible"
+                        className="group/collapsible text-white"
                     >
-                        <SidebarMenuItem>
+                        <SidebarMenuItem className="text-white">
                             <CollapsibleTrigger asChild>
-                                <SidebarMenuButton tooltip={item.title}>
-                                    {item.icon && <item.icon />}
+                                <SidebarMenuButton
+                                    tooltip={item.title}
+                                    className="text-white
+                                               hover:bg-[hsl(var(--primary-light))] 
+                                               transition-colors duration-200"
+                                >
+                                    {item.icon && (
+                                        <item.icon className="text-white" />
+                                    )}
                                     <span>{item.title}</span>
-                                    <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                                    <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 text-white" />
                                 </SidebarMenuButton>
                             </CollapsibleTrigger>
                             <CollapsibleContent>
-                                <SidebarMenuSub>
+                                <SidebarMenuSub className="text-white">
                                     {item.items?.map((subItem) => (
-                                        <SidebarMenuSubItem key={subItem.title}>
-                                            <SidebarMenuSubButton asChild>
-                                                <Link href={subItem.url}>
+                                        <SidebarMenuSubItem
+                                            key={subItem.title}
+                                            className="text-white"
+                                        >
+                                            <SidebarMenuSubButton
+                                                asChild
+                                                className="text-white
+                                                           hover:bg-[hsl(var(--primary-light))] 
+                                                           transition-colors duration-200"
+                                            >
+                                                <Link
+                                                    href={subItem.url}
+                                                    className="block w-full px-3 py-2 text-white"
+                                                >
                                                     <span>{subItem.title}</span>
                                                 </Link>
                                             </SidebarMenuSubButton>

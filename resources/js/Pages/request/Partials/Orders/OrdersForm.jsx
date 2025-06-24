@@ -16,7 +16,10 @@ const OrdersForm = ({
             className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8"
         >
             <div className="flex flex-col">
-                <label className="mb-2 text-lg font-semibold text-sky-900">
+                <label
+                    className="mb-2 text-lg font-semibold"
+                    style={{ color: "hsl(var(--primary))" }}
+                >
                     Requester Name
                 </label>
                 <OrdersCombobox
@@ -28,7 +31,10 @@ const OrdersForm = ({
             </div>
 
             <div className="flex flex-col">
-                <label className="mb-2 text-lg font-semibold text-sky-900">
+                <label
+                    className="mb-2 text-lg font-semibold"
+                    style={{ color: "hsl(var(--primary))" }}
+                >
                     Direct Supervisor
                 </label>
                 <OrdersCombobox
@@ -40,15 +46,28 @@ const OrdersForm = ({
             </div>
 
             <div className="flex flex-col md:col-span-2">
-                <label className="mb-2 text-lg font-semibold text-sky-900">
+                <label
+                    className="mb-2 text-lg font-semibold"
+                    style={{ color: "hsl(var(--primary))" }}
+                >
                     Purpose
                 </label>
                 <textarea
-                    className="p-3 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-sky-500"
-                    rows="2"
-                    placeholder="Enter the purpose..."
+                    className="p-3 rounded-sm resize-none focus:outline-none"
+                    style={{
+                        borderColor: "hsl(var(--border))",
+                        color: "hsl(var(--foreground))",
+                    }}
+                    rows={2}
+                    placeholder="Enter purpose..."
                     value={purpose}
                     onChange={(e) => setPurpose(e.target.value)}
+                    onFocus={(e) =>
+                        (e.target.style.borderColor = "hsl(var(--primary))")
+                    }
+                    onBlur={(e) =>
+                        (e.target.style.borderColor = "hsl(var(--border))")
+                    }
                 />
             </div>
         </form>

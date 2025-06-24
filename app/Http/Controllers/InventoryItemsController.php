@@ -13,7 +13,6 @@ class InventoryItemsController extends Controller
      */
     public function index()
     {
-
         $items = DB::table('tblinventory_items')
     ->select(
         'stock_no',

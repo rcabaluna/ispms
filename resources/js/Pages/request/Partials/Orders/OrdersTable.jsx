@@ -12,59 +12,102 @@ import { Trash2 } from "lucide-react";
 
 const OrdersTable = ({ items, updateQuantity, removeItem }) => {
     return (
-        <div className="overflow-x-auto rounded-lg shadow-sm border border-sky-300">
-            <Table className="min-w-full bg-white">
+        <div
+            className="overflow-x-auto rounded-sm shadow-sm border"
+            style={{ borderColor: "hsl(var(--border))" }}
+        >
+            <Table
+                className="min-w-full"
+                style={{ backgroundColor: "hsl(var(--card))" }}
+            >
                 <TableHeader>
-                    <TableRow className="bg-sky-100 text-sky-900 font-semibold">
-                        <TableHead className="py-3 px-6">Stock No</TableHead>
+                    <TableRow
+                        style={{
+                            backgroundColor: "hsl(var(--secondary))",
+                            color: "hsl(var(--secondary-foreground))",
+                            fontWeight: "600",
+                        }}
+                    >
                         <TableHead className="py-3 px-6">Item</TableHead>
                         <TableHead className="py-3 px-6 w-48 text-center">
                             Quantity
                         </TableHead>
-                        <TableHead className="py-3 px-6 w-24 text-center">
-                            Action
-                        </TableHead>
+                        <TableHead className="py-3 px-6 w-24 text-center"></TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {items.length ? (
                         items.map((item, idx) => (
                             <TableRow key={item.stock_no}>
-                                <TableCell className="py-4 px-6 text-sky-800">
-                                    {item.stock_no}
-                                </TableCell>
-                                <TableCell className="py-4 px-6">
+                                <TableCell
+                                    className="py-4 px-6"
+                                    style={{ color: "hsl(var(--foreground))" }}
+                                >
                                     <div>
-                                        <span className="font-semibold">
+                                        <span style={{ fontWeight: "600" }}>
                                             {item.item}
                                         </span>
                                         <br />
-                                        <span className="text-sm text-gray-500">
-                                            Available: {item.quantity}
+                                        <span
+                                            style={{
+                                                color: "hsl(var(--muted-foreground))",
+                                                fontSize: "0.875rem",
+                                            }}
+                                        >
+                                            Available: {item.quantity}{" "}
+                                            {item.uom_shorthand}.
                                         </span>
                                     </div>
                                 </TableCell>
                                 <TableCell className="py-4 px-6 text-center">
-                                    <div className="inline-flex items-center border rounded-md border-sky-300 bg-sky-50">
+                                    <div
+                                        className="inline-flex items-center border rounded-md"
+                                        style={{
+                                            borderColor: "hsl(var(--border))",
+                                            backgroundColor:
+                                                "hsl(var(--muted))",
+                                        }}
+                                    >
                                         <Button
                                             variant="outline"
                                             size="icon"
-                                            className="rounded-l-md border-none text-sky-700 hover:bg-sky-100"
+                                            className="rounded-l-md border-none"
+                                            style={{
+                                                color: "hsl(var(--primary))",
+                                            }}
                                             onClick={() =>
                                                 updateQuantity(idx, -1)
                                             }
                                             disabled={
                                                 item.requestedQuantity <= 1
                                             }
+                                            onMouseEnter={(e) =>
+                                                (e.currentTarget.style.backgroundColor =
+                                                    "hsl(var(--primary))")
+                                            }
+                                            onMouseLeave={(e) =>
+                                                (e.currentTarget.style.backgroundColor =
+                                                    "transparent")
+                                            }
                                         >
                                             –
                                         </Button>
-                                        <span className="w-10 text-lg text-center">
+                                        <span
+                                            className="w-10 text-lg text-center"
+                                            style={{
+                                                color: "hsl(var(--foreground))",
+                                            }}
+                                        >
                                             {item.requestedQuantity}
                                         </span>
                                         <Button
                                             size="icon"
-                                            className="rounded-r-md border-none bg-sky-600 text-white hover:bg-sky-700"
+                                            className="rounded-r-s border-none"
+                                            style={{
+                                                backgroundColor:
+                                                    "hsl(var(--primary))",
+                                                color: "hsl(var(--primary-foreground))",
+                                            }}
                                             onClick={() =>
                                                 updateQuantity(idx, 1)
                                             }
@@ -72,6 +115,18 @@ const OrdersTable = ({ items, updateQuantity, removeItem }) => {
                                                 item.requestedQuantity >=
                                                 item.quantity
                                             }
+                                            onMouseEnter={(e) => (
+                                                (e.currentTarget.style.backgroundColor =
+                                                    "hsl(var(--primary-foreground))"),
+                                                (e.currentTarget.style.color =
+                                                    "hsl(var(--primary))")
+                                            )}
+                                            onMouseLeave={(e) => (
+                                                (e.currentTarget.style.backgroundColor =
+                                                    "hsl(var(--primary))"),
+                                                (e.currentTarget.style.color =
+                                                    "hsl(var(--primary-foreground))")
+                                            )}
                                         >
                                             +
                                         </Button>
@@ -82,7 +137,17 @@ const OrdersTable = ({ items, updateQuantity, removeItem }) => {
                                         variant="ghost"
                                         size="icon"
                                         onClick={() => removeItem(idx)}
-                                        className="text-red-600 hover:text-red-700"
+                                        style={{
+                                            color: "hsl(var(--destructive))",
+                                        }}
+                                        onMouseEnter={(e) =>
+                                            (e.currentTarget.style.color =
+                                                "hsl(var(--destructive-foreground))")
+                                        }
+                                        onMouseLeave={(e) =>
+                                            (e.currentTarget.style.color =
+                                                "hsl(var(--destructive))")
+                                        }
                                     >
                                         <Trash2 className="w-5 h-5" />
                                     </Button>
@@ -93,7 +158,10 @@ const OrdersTable = ({ items, updateQuantity, removeItem }) => {
                         <TableRow>
                             <TableCell
                                 colSpan={4}
-                                className="text-center py-6 text-gray-400 italic"
+                                className="text-center py-6 italic"
+                                style={{
+                                    color: "hsl(var(--muted-foreground))",
+                                }}
                             >
                                 No items in cart.
                             </TableCell>

@@ -18,7 +18,6 @@ class InventoryRequestsController extends Controller
      */
     public function index()
     {
-        // Get all employees from mysql2 and key them by empNumber
         $employees = collect(DB::connection('mysql2')->select("
             SELECT 
                 a.empNumber, 
@@ -70,10 +69,12 @@ class InventoryRequestsController extends Controller
         $data = DB::table('tblrequest_details as a')
             ->join('tblinventory_items as b', 'b.stock_no', '=', 'a.stock_no')
             ->leftJoin('tblrequest_summary as s', 's.requestsummaryid', '=', 'a.requestsummaryid')
+            ->join('tbluom as c', 'c.uomid', '=', 'b.uomid')
             ->where('a.requestsummaryid', $requestsummaryid)
             ->select(
                 'a.*',
-                'b.item'
+                'b.item',
+                'c.name as uom_name'
             )
             ->groupBy(
                 'b.stock_no',

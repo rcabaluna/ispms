@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\InventoryItemsModel;
+use App\Models\Libraries\UOMModel;
 use App\Models\StockinModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class StockinController extends Controller
 {
@@ -32,6 +34,7 @@ class StockinController extends Controller
 
         $ponumber = $request->input('ponumber');
         $file = $request->input('excel_data');
+        
 
 
         StockinModel::create([
@@ -40,10 +43,22 @@ class StockinController extends Controller
 
         foreach ($file as $row) {
             if (!empty($row['quantity']) && $row['quantity'] > 0) {
+
+                $uom_trimmed = trim($row['uom']);
+                $uom = UOMModel::where('name', $uom_trimmed)->first();
+
+                if ($uom) {
+                    $uomid = $uom['uomid'];
+                } else {
+                    $uom = UOMModel::where('name', 'piece')->first();
+                    $uomid = $uom['uomid'];
+                }
+
                 InventoryItemsModel::create([
                     'stock_no' => $row['stock_no'],
                     'item' => $row['item'],
                     'quantity' => $row['quantity'],
+                    'uomid' => $uomid,
                     'unit_cost' => $row['unit_cost'],
                     'uacs_code' => $row['uacs_code'] ?? null,
                     'POnumber' => $ponumber
@@ -62,9 +77,11 @@ class StockinController extends Controller
     {
         $stockin = StockinModel::where('stockinid', $stockinid)->get()->first();
 
-   
-   
-        $items = InventoryItemsModel::where('POnumber', $stockin['POnumber'])->get();
+        $items = DB::table('tblinventory_items as a')
+        ->join('tbluom as b', 'b.uomid', '=', 'a.uomid')
+        ->select('a.*', 'b.name as uom_name')
+        ->where('a.POnumber', $stockin['POnumber'])
+        ->get();
 
 
         return inertia('stock-in/Partials/ItemsList', [

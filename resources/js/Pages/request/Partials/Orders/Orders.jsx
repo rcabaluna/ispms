@@ -25,7 +25,14 @@ const Orders = ({ employees, selectedItem, onItemAdded }) => {
     } = useOrders({ employees, selectedItem, onItemAdded });
 
     return (
-        <section className="w-full p-8 bg-white rounded-2xl shadow-lg border border-sky-200">
+        <section
+            className="w-full py-10"
+            style={{
+                backgroundColor: "hsl(var(--card))",
+                borderColor: "hsl(var(--border))",
+                color: "hsl(var(--card-foreground))",
+            }}
+        >
             <OrdersForm
                 employees={employees}
                 requesterName={requesterName}
@@ -52,7 +59,30 @@ const Orders = ({ employees, selectedItem, onItemAdded }) => {
                         !supervisor ||
                         items.length === 0
                     }
-                    className="text-lg px-6 py-3 bg-sky-700 text-white hover:bg-sky-800 disabled:opacity-50 flex items-center gap-2"
+                    className="text-lg px-6 py-3 flex items-center gap-2"
+                    style={{
+                        backgroundColor: isProcessing
+                            ? "hsl(var(--muted))"
+                            : "hsl(var(--primary))",
+                        color: isProcessing
+                            ? "hsl(var(--muted-foreground))"
+                            : "hsl(var(--primary-foreground))",
+                        cursor: isProcessing ? "not-allowed" : "pointer",
+                        opacity: isProcessing ? 0.5 : 1,
+                    }}
+                    onMouseEnter={(e) => {
+                        if (!isProcessing)
+                            e.currentTarget.style.backgroundColor =
+                                "hsl(var(--primary-foreground))";
+                        e.currentTarget.style.color = "hsl(var(--primary))";
+                    }}
+                    onMouseLeave={(e) => {
+                        if (!isProcessing)
+                            e.currentTarget.style.backgroundColor =
+                                "hsl(var(--primary))";
+                        e.currentTarget.style.color =
+                            "hsl(var(--primary-foreground))";
+                    }}
                 >
                     {isProcessing ? (
                         <>
@@ -62,7 +92,7 @@ const Orders = ({ employees, selectedItem, onItemAdded }) => {
                     ) : (
                         <>
                             <ShoppingCart className="w-5 h-5" />
-                            Checkout
+                            Submit
                         </>
                     )}
                 </Button>

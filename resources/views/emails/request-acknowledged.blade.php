@@ -10,8 +10,8 @@
     <li><strong>Status:</strong> {{ $data['requestSummary']->xstatus }}</li>
 </ul>
 
-<p>We will notify you once the item(s) are ready to be picked up from the <strong>Supply Office</strong>.</p>
+<p>We will notify you once the item(s) are ready from the <strong>Supply Office</strong>.</p>
 
 <p>If you have any questions or need further assistance, feel free to contact us.</p>
 
-<p>Thank you,<br>DOST 10 - Supply Unit</p>
+<p>Thank you,<br><b>DOST 10 - Supply Unit</b></p>

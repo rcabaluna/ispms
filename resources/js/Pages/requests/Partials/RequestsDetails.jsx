@@ -223,7 +223,7 @@ const RequestsDetails = ({
 
     if (!selectedRequest)
         return (
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-muted-foreground text-center">
                 No request selected.
             </div>
         );
@@ -251,7 +251,7 @@ const RequestsDetails = ({
             .join(" ");
 
     return (
-        <div className="border bg-background p-4 shadow-sm space-y-4 text-sm">
+        <div className="border bg-background p-4 rounded-md shadow-sm space-y-4 text-sm">
             <div className="flex justify-between items-center">
                 <h2 className="text-lg font-semibold text-primary">
                     Request Summary
@@ -304,16 +304,16 @@ const RequestsDetails = ({
 
             <div className="space-y-1">
                 <p>
-                    <strong>Purpose:</strong> {selectedRequest.purpose}
-                </p>
-                <p>
                     <strong>Requester:</strong> {formatName(requester)}
                 </p>
                 <p>
                     <strong>Supervisor:</strong> {formatName(supervisor)}
                 </p>
                 <p>
-                    <strong>Request Date:</strong>{" "}
+                    <strong>Purpose:</strong> {selectedRequest.purpose}
+                </p>
+                <p className="text-right">
+                    <strong>Date Requested:</strong>{" "}
                     {new Date(selectedRequest.requestdate).toLocaleDateString(
                         "en-US",
                         {
@@ -334,7 +334,8 @@ const RequestsDetails = ({
                         <TableRow>
                             <TableHead>Served</TableHead>
                             <TableHead>Item</TableHead>
-                            <TableHead>Requested</TableHead>
+                            <TableHead>UOM</TableHead>
+                            <TableHead>Requested Qty</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -372,6 +373,7 @@ const RequestsDetails = ({
                                             disabled={!isAcknowledged}
                                         />
                                     </TableCell>
+
                                     <TableCell
                                         onClick={() =>
                                             isAcknowledged &&
@@ -380,6 +382,15 @@ const RequestsDetails = ({
                                         className={textStyle}
                                     >
                                         {item.item}
+                                    </TableCell>
+                                    <TableCell
+                                        onClick={() =>
+                                            isAcknowledged &&
+                                            toggleScratch(index)
+                                        }
+                                        className={textStyle}
+                                    >
+                                        {item.uom_name}
                                     </TableCell>
                                     <TableCell
                                         onClick={() =>

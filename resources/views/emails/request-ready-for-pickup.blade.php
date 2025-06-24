@@ -1,6 +1,6 @@
 <p>Dear Requester,</p>
 
-<p>We are pleased to inform you that your requested item(s) are now <strong>ready for pickup</strong> at the Supply Office.</p>
+<p>We are pleased to inform you that your requested item(s) are now <strong>ready</strong> at the Supply Office.</p>
 
 <p>Please find the request summary details below:</p>
 
@@ -12,8 +12,8 @@
 
 </ul>
 
-<p>Kindly proceed to the <strong>Supply Office</strong> to collect your items.</p>
+<p>Kindly proceed to the <strong>Supply Office</strong> to collect your requested items.</p>
 
-<p>If you have any questions or require assistance, don’t hesitate to contact us.</p>
+<p>If you have any questions or require assistance, don't hesitate to contact us.</p>
 
-<p>Thank you,<br>DOST 10 - Supply Unit</p>
+<p>Thank you,<br><b>DOST 10 - Supply Unit</b></p>

@@ -13,12 +13,10 @@ class Authenticate
     public function handle(Request $request, Closure $next)
     {
 
-        // Check if user is authenticated and has 'admin' role
         if (Auth::check()) {
-            return $next($request); // Allow access
+            return $next($request);
         }
 
-        // Optional: redirect or abort if not authorized
-        return abort(403, 'Unauthorized access.');
+        return redirect('/');
     }
 }

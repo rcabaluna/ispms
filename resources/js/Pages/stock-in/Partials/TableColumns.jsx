@@ -185,6 +185,7 @@ export const columns = [
                                 onClick={() => {
                                     setPONumber(stockin.ponumber);
                                     setEditOpen(true);
+                                    setOpen(false);
                                 }}
                             >
                                 Edit
@@ -238,9 +239,7 @@ export const columns = [
                             </DialogHeader>
                             <div className="grid gap-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="serial">
-                                        PO Number
-                                    </Label>
+                                    <Label htmlFor="serial">PO Number</Label>
                                     <Input
                                         id="serial"
                                         value={PONumber}
