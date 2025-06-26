@@ -15,12 +15,12 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/Components/ui/table";
+} from "@/components/ui/table";
 
 import { Input } from "@/components/ui/input";
 import React from "react";
-import { Label } from "@/Components/ui/label";
-import { DataTablePagination } from "@/Components/table-functions/DataTablePagination";
+import { Label } from "@/components/ui/label";
+import { DataTablePagination } from "@/components/table-functions/DataTablePagination";
 
 export function DataTable({ columns, data }) {
     const [globalFilter, setGlobalFilter] = React.useState("");
