@@ -44,7 +44,7 @@ class CreateTblCoreTable extends Migration
             $table->increments('requestsummaryid');
             $table->string('requester', 45);
             $table->string('supervisor')->nullable();
-            $table->date('requestdate')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('requestdate')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->text('purpose')->nullable();
             $table->string('xstatus', 45)->default('Pending');
             $table->text('remarks')->nullable();

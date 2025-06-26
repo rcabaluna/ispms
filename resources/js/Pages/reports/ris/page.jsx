@@ -1,16 +1,16 @@
 import React, { useState } from "react";
 import MainLayout from "@/Layouts/MainLayout";
-import { Input } from "@/Components/ui/input";
+import { Input } from "@/components/ui/input";
 import EmployeesTable from "./Partials/EmployeesTable";
-import { Button } from "@/Components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/Components/ui/select";
-import { Toaster } from "@/Components/ui/toaster";
+} from "@/components/ui/select";
+import { Toaster } from "@/components/ui/toaster";
 import RISDetails from "./Partials/RISDetails";
 
 const RIS = ({ employees }) => {

@@ -2,7 +2,7 @@ import MainLayout from "@/Layouts/MainLayout";
 import React, { useState } from "react";
 import { DataTable } from "./Partials/DataTable";
 import { columns } from "./Partials/TableColumns";
-import { Input } from "@/Components/ui/input";
+import { Input } from "@/components/ui/input";
 import * as XLSX from "xlsx";
 import {
     AlertDialog,
@@ -15,7 +15,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/Components/ui/button";
+import { Button } from "@/components/ui/button";
 
 import ToUploadItemsTable from "./Partials/ToUploadItemsTable";
 import { router } from "@inertiajs/react";

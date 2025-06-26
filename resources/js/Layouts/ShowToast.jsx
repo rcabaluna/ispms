@@ -1,4 +1,4 @@
-import { Toaster } from "@/Components/ui/toaster";
+import { Toaster } from "@/components/ui/toaster";
 import { toast } from "@/hooks/use-toast";
 
 export function ShowToast({ title, description, className }) {

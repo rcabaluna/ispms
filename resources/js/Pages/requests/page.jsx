@@ -7,7 +7,7 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/Components/ui/select";
+} from "@/components/ui/select";
 import { Toaster } from "@/components/ui/toaster";
 import RequestsDetails from "./Partials/RequestsDetails";
 

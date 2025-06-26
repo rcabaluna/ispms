@@ -2,7 +2,7 @@
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "@/components/table-functions/DataTableColumnHeader";
-import { Input } from "@/Components/ui/input";
+import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { router } from "@inertiajs/react";
 import { useDebouncedCallback } from "use-debounce";

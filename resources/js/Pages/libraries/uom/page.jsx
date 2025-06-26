@@ -2,7 +2,7 @@ import MainLayout from "@/Layouts/MainLayout";
 import React, { useState } from "react";
 import { DataTable } from "./partials/DataTable";
 import { columns } from "./partials/TableColumns";
-import { Toaster } from "@/Components/ui/toaster";
+import { Toaster } from "@/components/ui/toaster";
 import {
     AlertDialog,
     AlertDialogCancel,
@@ -12,8 +12,8 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/Components/ui/button";
-import { Input } from "@/Components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useForm } from "@inertiajs/react";
 import { ShowToast } from "@/Layouts/ShowToast";
 
