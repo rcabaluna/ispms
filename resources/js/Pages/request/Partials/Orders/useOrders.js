@@ -83,8 +83,8 @@ const useOrders = ({ employees, selectedItem, onItemAdded }) => {
                     setItems([]);
                     setRequesterName("");
                     setSupervisorName("");
-                    alert("Order submitted successfully!");
                     setIsProcessing(false);
+                    window.location.href = "/items/request/sent";
                 },
                 onError: (errors) => {
                     console.error("Checkout error:", errors);
