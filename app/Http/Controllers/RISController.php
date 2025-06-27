@@ -11,9 +11,12 @@ class RISController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        // Step 1: Get employees from the other database
+        $month = $request->query('month', now()->format('m'));
+        $year = $request->query('year', now()->format('Y'));
+
+        // Step 1: Get employees from other DB
         $employees = DB::connection('mysql2')->select("
             SELECT 
                 a.empNumber, 
@@ -45,17 +48,33 @@ class RISController extends Controller
                 a.surname ASC
         ");
 
+        // Step 2: RIS numbers
         $emprisno = RISNoModel::pluck('risno', 'empnumber')->toArray();
 
-        $employeesWithRisno = array_map(function ($employee) use ($emprisno) {
+        // Step 3: Get unique empNumbers from `supervisor` column
+        $supervisorEmpNumbers = DB::table('tblrequest_summary')
+            ->select('supervisor')
+            ->distinct()
+            ->where('xstatus', 'Served')
+            ->whereMonth('requestDate', $month)
+            ->whereYear('requestDate', $year)
+            ->pluck('supervisor')
+            ->toArray(); // assumes supervisor = empNumber
+
+        // Step 4: Merge risno + supervisor check
+        $employeesWithRisno = array_map(function ($employee) use ($emprisno, $supervisorEmpNumbers) {
             $employee->risno = $emprisno[$employee->empNumber] ?? null;
+            $employee->has_served = in_array($employee->empNumber, $supervisorEmpNumbers);
             return $employee;
         }, $employees);
+
 
         return inertia('reports/ris/page', [
             'employees' => $employeesWithRisno,
         ]);
     }
+
+
 
     public function show(Request $request, string $empNumber)
     {   

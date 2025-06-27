@@ -44,7 +44,7 @@
 
             // RIS
             Route::prefix('reports/ris')->controller(RISController::class)->group(function () {
-                Route::get('/', 'index');
+                Route::get('/', 'index')->name('ris.index');
                 Route::get('/show/{empnumber}', 'show')->name('ris.show');
             });
 
@@ -64,7 +64,6 @@
                 Route::get('/', 'index');
                 Route::post('/', 'store')->name('uom.store');
                 Route::put('/{uomid}', 'update')->name('uom.update');
-
             });
 
 

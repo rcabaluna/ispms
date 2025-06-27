@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { Toaster } from "@/components/ui/toaster";
 import RISDetails from "./Partials/RISDetails";
+import { router } from "@inertiajs/react";
 
 const RIS = ({ employees }) => {
     const currentDate = new Date();
@@ -78,6 +79,17 @@ const RIS = ({ employees }) => {
         printWindow.close();
     };
 
+    const fetchEmployees = (month, year) => {
+        router.get(
+            route("ris.index"),
+            { month, year },
+            {
+                preserveState: true,
+                preserveScroll: true,
+            }
+        );
+    };
+
     return (
         <>
             <div className="flex flex-1 flex-col p-4 pt-0">
@@ -112,7 +124,10 @@ const RIS = ({ employees }) => {
                             <div className="flex gap-4 items-center">
                                 <p>Filters:</p>
                                 <Select
-                                    onValueChange={setSelectedMonth}
+                                    onValueChange={(value) => {
+                                        setSelectedMonth(value);
+                                        fetchEmployees(value, selectedYear);
+                                    }}
                                     value={selectedMonth}
                                 >
                                     <SelectTrigger className="w-[150px]">
@@ -136,7 +151,10 @@ const RIS = ({ employees }) => {
                                 </Select>
 
                                 <Select
-                                    onValueChange={setSelectedYear}
+                                    onValueChange={(value) => {
+                                        setSelectedYear(value);
+                                        fetchEmployees(selectedMonth, value);
+                                    }}
                                     value={selectedYear}
                                 >
                                     <SelectTrigger className="w-[120px]">
