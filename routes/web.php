@@ -49,7 +49,9 @@
             });
 
             Route::prefix('reports/rsmi')->controller(RSMIController::class)->group(function () {
-                Route::get('/', 'index');
+                Route::get('/', 'index')->name('rsmi.index');
+                Route::get('/show', 'show')->name('rsmi.show');
+
             });
 
             Route::resource('inventory/stock-in', StockinController::class);
